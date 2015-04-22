@@ -10,14 +10,17 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	0.1.1
+Version:	0.1.2
 Release:	1
 License:	GPL v2
 Group:		Applications/System
 Source0:	http://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	87819887a63bbf953e9ee4e3aa54359a
+# Source0-md5:	f907f5b9750b6e7904d6e5784d8a692a
+Patch0:		%{name}-sh.patch
 URL:		https://github.com/hughsie/fwupd
 BuildRequires:	appstream-glib-devel >= 0.3.5
+BuildRequires:	autoconf >= 2.63
+BuildRequires:	automake >= 1:1.9
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.9}
 BuildRequires:	docbook-utils
 %{?with_efi:BuildRequires:	fwupdate-devel}
@@ -25,8 +28,11 @@ BuildRequires:	gcab-devel
 BuildRequires:	gettext-tools >= 0.17
 BuildRequires:	glib2-devel >= 1:2.36.0
 BuildRequires:	gobject-introspection-devel >= 0.9.8
+BuildRequires:	gpgme-devel
 BuildRequires:	intltool >= 0.35.0
+BuildRequires:	libgpg-error-devel
 %{?with_colorhug:BuildRequires:	libgusb-devel >= 0.2.2}
+BuildRequires:	libtool
 BuildRequires:	libxslt-progs
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.103
@@ -93,9 +99,16 @@ Statyczna biblioteka fwupd.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
+%{__libtoolize}
+%{__aclocal} -I m4
+%{__autoconf}
+%{__autoheader}
+%{__automake}
 %configure \
+	--disable-silent-rules \
 	%{!?with_static_libs:--disable-static} \
 	%{!?with_efi:--disable-uefi} \
 	--with-systemdsystemunitdir=%{systemdunitdir}
@@ -125,6 +138,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS MAINTAINERS NEWS README.md
 %attr(755,root,root) %{_bindir}/fwupdmgr
 %attr(755,root,root) %{_libexecdir}/fwupd
+%dir /etc/pki/fwupd
+/etc/pki/fwupd/GPG-KEY-Hughski-Limited
 %{systemdunitdir}/fwupd.service
 /etc/dbus-1/system.d/org.freedesktop.fwupd.conf
 %{_datadir}/dbus-1/system-services/org.freedesktop.fwupd.service

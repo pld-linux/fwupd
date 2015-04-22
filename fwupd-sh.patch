@@ -1,0 +1,17 @@
+--- fwupd-0.1.2/configure.ac.orig	2015-04-22 11:55:28.000000000 +0200
++++ fwupd-0.1.2/configure.ac	2015-04-22 21:28:05.199909104 +0200
+@@ -138,10 +138,10 @@
+ 	AC_MSG_ERROR([Cannot locate gpgme])
+ else
+ 	AC_MSG_RESULT([yes])
+-	GPGME_CFLAGS="`\"/usr/bin/gpgme-config\" --cflags`"
+-	GPGME_LIBS="`\"/usr/bin/gpgme-config\" --libs`"
+-	GPGME_CFLAGS+=" `\"/usr/bin/gpg-error-config\" --cflags`"
+-	GPGME_LIBS+=" `\"/usr/bin/gpg-error-config\" --libs`"
++	GPGME_CFLAGS="$(/usr/bin/gpgme-config --cflags)"
++	GPGME_LIBS="$(/usr/bin/gpgme-config --libs)"
++	GPGME_CFLAGS="$GPGME_CFLAGS $(/usr/bin/gpg-error-config --cflags)"
++	GPGME_LIBS="$GPGME_LIBS $(/usr/bin/gpg-error-config --libs)"
+ 	AC_SUBST([GPGME_CFLAGS])
+ 	AC_SUBST([GPGME_LIBS])
+ fi
