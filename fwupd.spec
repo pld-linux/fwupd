@@ -10,12 +10,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	0.1.2
+Version:	0.1.3
 Release:	1
 License:	GPL v2
 Group:		Applications/System
 Source0:	http://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	f907f5b9750b6e7904d6e5784d8a692a
+# Source0-md5:	a438a739c2f375c8268d2b726efd2bf2
 Patch0:		%{name}-sh.patch
 URL:		https://github.com/hughsie/fwupd
 BuildRequires:	appstream-glib-devel >= 0.3.5
@@ -141,6 +141,8 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/pki/fwupd
 /etc/pki/fwupd/GPG-KEY-Hughski-Limited
 %{systemdunitdir}/fwupd.service
+%{systemdunitdir}/fwupd-offline-update.service
+%{systemdunitdir}/system-update.target.wants/fwupd-offline-update.service
 /etc/dbus-1/system.d/org.freedesktop.fwupd.conf
 %{_datadir}/dbus-1/system-services/org.freedesktop.fwupd.service
 %{_datadir}/polkit-1/actions/org.freedesktop.fwupd.policy
