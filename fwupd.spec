@@ -10,15 +10,15 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	0.1.3
+Version:	0.1.6
 Release:	1
 License:	GPL v2
 Group:		Applications/System
 Source0:	http://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	a438a739c2f375c8268d2b726efd2bf2
+# Source0-md5:	81551ee30bc062257583393474f375c4
 Patch0:		%{name}-sh.patch
 URL:		https://github.com/hughsie/fwupd
-BuildRequires:	appstream-glib-devel >= 0.3.5
+BuildRequires:	appstream-glib-devel >= 0.5.0
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.9
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.9}
@@ -30,8 +30,10 @@ BuildRequires:	glib2-devel >= 1:2.36.0
 BuildRequires:	gobject-introspection-devel >= 0.9.8
 BuildRequires:	gpgme-devel
 BuildRequires:	intltool >= 0.35.0
+BuildRequires:	libarchive-devel
 BuildRequires:	libgpg-error-devel
-%{?with_colorhug:BuildRequires:	libgusb-devel >= 0.2.2}
+BuildRequires:	libgusb-devel >= 0.2.2
+BuildRequires:	libsoup-devel >= 2.42
 BuildRequires:	libtool
 BuildRequires:	libxslt-progs
 BuildRequires:	pkgconfig
@@ -42,9 +44,9 @@ BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-glib-devel
 BuildRequires:	xz
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	appstream-glib >= 0.3.5
+Requires:	appstream-glib >= 0.5.0
 %{?with_colorhug:Requires:	colord-libs >= 1.2.9}
-%{?with_colorhug:Requires:	libgusb >= 0.2.2}
+Requires:	libgusb >= 0.2.2
 Requires:	polkit >= 0.103
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -138,11 +140,16 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS MAINTAINERS NEWS README.md
 %attr(755,root,root) %{_bindir}/fwupdmgr
 %attr(755,root,root) %{_libexecdir}/fwupd
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd.conf
 %dir /etc/pki/fwupd
 /etc/pki/fwupd/GPG-KEY-Hughski-Limited
+/etc/pki/fwupd/GPG-KEY-Linux-Vendor-Firmware-Service
+%dir /etc/pki/fwupd-metadata
+/etc/pki/fwupd-metadata/GPG-KEY-Linux-Vendor-Firmware-Service
 %{systemdunitdir}/fwupd.service
 %{systemdunitdir}/fwupd-offline-update.service
 %{systemdunitdir}/system-update.target.wants/fwupd-offline-update.service
+/lib/udev/rules.d/90-fwupd-devices.rules
 /etc/dbus-1/system.d/org.freedesktop.fwupd.conf
 %{_datadir}/dbus-1/system-services/org.freedesktop.fwupd.service
 %{_datadir}/polkit-1/actions/org.freedesktop.fwupd.policy
