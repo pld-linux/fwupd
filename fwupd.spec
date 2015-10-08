@@ -10,12 +10,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	0.1.6
+Version:	0.5.1
 Release:	1
 License:	GPL v2
 Group:		Applications/System
 Source0:	http://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	81551ee30bc062257583393474f375c4
+# Source0-md5:	0ea513d26bb22f874535d051692b0808
 Patch0:		%{name}-sh.patch
 URL:		https://github.com/hughsie/fwupd
 BuildRequires:	appstream-glib-devel >= 0.5.0
@@ -26,14 +26,14 @@ BuildRequires:	docbook-utils
 %{?with_efi:BuildRequires:	fwupdate-devel}
 BuildRequires:	gcab-devel
 BuildRequires:	gettext-tools >= 0.17
-BuildRequires:	glib2-devel >= 1:2.36.0
+BuildRequires:	glib2-devel >= 1:2.45.8
 BuildRequires:	gobject-introspection-devel >= 0.9.8
 BuildRequires:	gpgme-devel
 BuildRequires:	intltool >= 0.35.0
 BuildRequires:	libarchive-devel
 BuildRequires:	libgpg-error-devel
 BuildRequires:	libgusb-devel >= 0.2.2
-BuildRequires:	libsoup-devel >= 2.42
+BuildRequires:	libsoup-devel >= 2.52
 BuildRequires:	libtool
 BuildRequires:	libxslt-progs
 BuildRequires:	pkgconfig
@@ -47,6 +47,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 Requires:	appstream-glib >= 0.5.0
 %{?with_colorhug:Requires:	colord-libs >= 1.2.9}
 Requires:	libgusb >= 0.2.2
+Requires:	libsoup >= 2.52
 Requires:	polkit >= 0.103
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -66,7 +67,7 @@ tabletów i farm serwerów.
 Summary:	Library for fwupd device firmware installing daemon
 Summary(pl.UTF-8):	Biblioteka dla demona fwupd instalującego aktualizacje firmware'u
 Group:		Libraries
-Requires:	glib2-devel >= 1:2.36.0
+Requires:	glib2-devel >= 1:2.45.8
 
 %description libs
 Library for fwupd device firmware installing daemon.
@@ -79,7 +80,7 @@ Summary:	Header files for fwupd library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki fwupd
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	glib2-devel >= 1:2.36.0
+Requires:	glib2-devel >= 1:2.45.8
 
 %description devel
 Header files for fwupd library.
@@ -113,7 +114,7 @@ Statyczna biblioteka fwupd.
 	--disable-silent-rules \
 	%{!?with_static_libs:--disable-static} \
 	%{!?with_efi:--disable-uefi} \
-	--with-systemdsystemunitdir=%{systemdunitdir}
+	--with-systemdunitdir=%{systemdunitdir}
 %{__make}
 
 %install
