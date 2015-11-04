@@ -10,15 +10,15 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	0.5.1
+Version:	0.5.2
 Release:	1
 License:	GPL v2
 Group:		Applications/System
 Source0:	http://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	0ea513d26bb22f874535d051692b0808
+# Source0-md5:	da99ef2e0e43c2efe5a8f865916b6ddd
 Patch0:		%{name}-sh.patch
 URL:		https://github.com/hughsie/fwupd
-BuildRequires:	appstream-glib-devel >= 0.5.0
+BuildRequires:	appstream-glib-devel >= 0.5.2
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.9
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.9}
@@ -44,7 +44,7 @@ BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-glib-devel
 BuildRequires:	xz
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	appstream-glib >= 0.5.0
+Requires:	appstream-glib >= 0.5.2
 %{?with_colorhug:Requires:	colord-libs >= 1.2.9}
 Requires:	libgusb >= 0.2.2
 Requires:	libsoup >= 2.52
