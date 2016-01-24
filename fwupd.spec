@@ -10,18 +10,18 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	0.5.4
+Version:	0.6.1
 Release:	1
 License:	GPL v2
 Group:		Applications/System
 Source0:	http://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	84dff90d5a9eef2ab09c49aa242a5cd7
+# Source0-md5:	49d5c940cb50b029249f3c20a2cf6360
 Patch0:		%{name}-sh.patch
 URL:		https://github.com/hughsie/fwupd
-BuildRequires:	appstream-glib-devel >= 0.5.2
+BuildRequires:	appstream-glib-devel >= 0.5.4
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.9
-%{?with_colorhug:BuildRequires:	colord-devel >= 1.2.9}
+%{?with_colorhug:BuildRequires:	colord-devel >= 1.2.12}
 BuildRequires:	docbook-utils
 %{?with_efi:BuildRequires:	fwupdate-devel >= 0.5}
 BuildRequires:	gcab-devel
@@ -29,10 +29,11 @@ BuildRequires:	gettext-tools >= 0.17
 BuildRequires:	glib2-devel >= 1:2.45.8
 BuildRequires:	gobject-introspection-devel >= 0.9.8
 BuildRequires:	gpgme-devel
+BuildRequires:	gtk-doc >= 1.14
 BuildRequires:	intltool >= 0.35.0
 BuildRequires:	libarchive-devel
 BuildRequires:	libgpg-error-devel
-BuildRequires:	libgusb-devel >= 0.2.2
+BuildRequires:	libgusb-devel >= 0.2.8
 BuildRequires:	libsoup-devel >= 2.52
 BuildRequires:	libtool
 BuildRequires:	libxslt-progs
@@ -44,10 +45,10 @@ BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-glib-devel
 BuildRequires:	xz
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	appstream-glib >= 0.5.2
-%{?with_colorhug:Requires:	colord-libs >= 1.2.9}
+Requires:	appstream-glib >= 0.5.4
+%{?with_colorhug:Requires:	colord-libs >= 1.2.12}
 %{?with_efi:Requires:	fwupdate-libs >= 0.5}
-Requires:	libgusb >= 0.2.2
+Requires:	libgusb >= 0.2.8
 Requires:	libsoup >= 2.52
 Requires:	polkit >= 0.103
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -65,41 +66,52 @@ komputerów osobistych, ale może być interesujący także dla telefonów,
 tabletów i farm serwerów.
 
 %package libs
-Summary:	Library for fwupd device firmware installing daemon
-Summary(pl.UTF-8):	Biblioteka dla demona fwupd instalującego aktualizacje firmware'u
+Summary:	Libraries for fwupd device firmware installing daemon
+Summary(pl.UTF-8):	Biblioteki dla demona fwupd instalującego aktualizacje firmware'u
 Group:		Libraries
 Requires:	glib2-devel >= 1:2.45.8
 
 %description libs
-Library for fwupd device firmware installing daemon.
+Libraries for fwupd device firmware installing daemon.
 
 %description libs -l pl.UTF-8
-Biblioteka dla demona fwupd instalującego aktualizacje firmware'u.
+Biblioteki dla demona fwupd instalującego aktualizacje firmware'u.
 
 %package devel
-Summary:	Header files for fwupd library
-Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki fwupd
+Summary:	Header files for fwupd libraries
+Summary(pl.UTF-8):	Pliki nagłówkowe bibliotek fwupd
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	glib2-devel >= 1:2.45.8
 
 %description devel
-Header files for fwupd library.
+Header files for fwupd libraries.
 
 %description devel -l pl.UTF-8
-Pliki nagłówkowe biblioteki fwupd.
+Pliki nagłówkowe bibliotek fwupd.
 
 %package static
-Summary:	Static fwupd library
-Summary(pl.UTF-8):	Statyczna biblioteka fwupd
+Summary:	Static fwupd libraries
+Summary(pl.UTF-8):	Statyczne biblioteki fwupd
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
-Static fwupd library.
+Static fwupd libraries.
 
 %description static -l pl.UTF-8
-Statyczna biblioteka fwupd.
+Statyczne biblioteki fwupd.
+
+%package apidocs
+Summary:	API documentation for fwupd libraries
+Summary(pl.UTF-8):	Dokumentacja API do bibliotek fwupd
+Group:		Documentation
+
+%description apidocs
+API documentation for fwupd libraries.
+
+%description apidocs -l pl.UTF-8
+Dokumentacja API do bibliotek fwupd.
 
 %prep
 %setup -q
@@ -115,6 +127,7 @@ Statyczna biblioteka fwupd.
 	--disable-silent-rules \
 	%{!?with_static_libs:--disable-static} \
 	%{!?with_efi:--disable-uefi} \
+	--with-html-dir=%{_gtkdocdir} \
 	--with-systemdunitdir=%{systemdunitdir}
 %{__make}
 
@@ -125,7 +138,7 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT
 
 # obsoleted by pkg-config
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libfwupd.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/lib{dfu,fwupd}.la
 
 %{__mv} $RPM_BUILD_ROOT%{_localedir}/{hi_IN,hi}
 
@@ -140,6 +153,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -f %{name}.lang
 %defattr(644,root,root,755)
 %doc AUTHORS MAINTAINERS NEWS README.md
+%attr(755,root,root) %{_bindir}/dfu-tool
 %attr(755,root,root) %{_bindir}/fwupdmgr
 %attr(755,root,root) %{_libexecdir}/fwupd
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd.conf
@@ -156,25 +170,40 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/dbus-1/system-services/org.freedesktop.fwupd.service
 %{_datadir}/polkit-1/actions/org.freedesktop.fwupd.policy
 %{_datadir}/polkit-1/rules.d/org.freedesktop.fwupd.rules
+%dir /var/cache/app-info
+%dir /var/cache/app-info/icons
+%dir /var/cache/app-info/xmls
 %dir /var/lib/fwupd
+%{_mandir}/man1/dfu-tool.1*
 %{_mandir}/man1/fwupdmgr.1*
 
 %files libs
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libdfu.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libdfu.so.1
 %attr(755,root,root) %{_libdir}/libfwupd.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libfwupd.so.1
+%{_libdir}/girepository-1.0/Dfu-1.0.typelib
 %{_libdir}/girepository-1.0/Fwupd-1.0.typelib
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libfwupd.so
+%attr(755,root,root) %{_libdir}/libdfu.so
 %{_includedir}/fwupd-1
+%{_datadir}/gir-1.0/Dfu-1.0.gir
 %{_datadir}/gir-1.0/Fwupd-1.0.gir
 %{_datadir}/dbus-1/interfaces/org.freedesktop.fwupd.xml
+%{_pkgconfigdir}/dfu.pc
 %{_pkgconfigdir}/fwupd.pc
 
 %if %{with static_libs}
 %files static
 %defattr(644,root,root,755)
+%{_libdir}/libdfu.a
 %{_libdir}/libfwupd.a
 %endif
+
+%files apidocs
+%defattr(644,root,root,755)
+%{_gtkdocdir}/libdfu
