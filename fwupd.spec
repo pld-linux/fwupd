@@ -10,15 +10,15 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	0.6.2
+Version:	0.6.3
 Release:	1
 License:	GPL v2
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	3d8ad9ef27f112ed06c8ecd8d5a7a1ea
+# Source0-md5:	3bee1332ef4dbcd8319b6ec6a99e8063
 Patch0:		%{name}-sh.patch
 URL:		https://github.com/hughsie/fwupd
-BuildRequires:	appstream-glib-devel >= 0.5.4
+BuildRequires:	appstream-glib-devel >= 0.5.10
 BuildRequires:	autoconf >= 2.63
 BuildRequires:	automake >= 1:1.9
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.12}
@@ -45,7 +45,7 @@ BuildRequires:	tar >= 1:1.22
 BuildRequires:	udev-glib-devel
 BuildRequires:	xz
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	appstream-glib >= 0.5.4
+Requires:	appstream-glib >= 0.5.10
 %{?with_colorhug:Requires:	colord-libs >= 1.2.12}
 %{?with_efi:Requires:	fwupdate-libs >= 0.5}
 Requires:	libgusb >= 0.2.8
@@ -139,6 +139,11 @@ rm -rf $RPM_BUILD_ROOT
 
 # obsoleted by pkg-config
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/lib{dfu,fwupd}.la
+# loadable modules
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/fwupd-plugins-1/lib*.la
+%if %{with static_libs}
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/fwupd-plugins-1/lib*.a
+%endif
 
 %{__mv} $RPM_BUILD_ROOT%{_localedir}/{hi_IN,hi}
 
@@ -156,6 +161,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/dfu-tool
 %attr(755,root,root) %{_bindir}/fwupdmgr
 %attr(755,root,root) %{_libexecdir}/fwupd
+%dir %{_libdir}/fwupd-plugins-1
+%attr(755,root,root) %{_libdir}/fwupd-plugins-1/libfu_plugin_test.so
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd.conf
 %dir /etc/pki/fwupd
 /etc/pki/fwupd/GPG-KEY-Hughski-Limited
@@ -167,6 +174,10 @@ rm -rf $RPM_BUILD_ROOT
 %{systemdunitdir}/system-update.target.wants/fwupd-offline-update.service
 /lib/udev/rules.d/90-fwupd-devices.rules
 /etc/dbus-1/system.d/org.freedesktop.fwupd.conf
+# XXX: dir shared with AppStream
+%dir %{_datadir}/app-info
+%dir %{_datadir}/app-info/xmls
+%{_datadir}/app-info/xmls/org.freedesktop.fwupd.xml
 %{_datadir}/dbus-1/system-services/org.freedesktop.fwupd.service
 %{_datadir}/polkit-1/actions/org.freedesktop.fwupd.policy
 %{_datadir}/polkit-1/rules.d/org.freedesktop.fwupd.rules
