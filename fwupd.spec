@@ -10,12 +10,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	0.6.3
+Version:	0.7.0
 Release:	1
 License:	GPL v2
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	3bee1332ef4dbcd8319b6ec6a99e8063
+# Source0-md5:	4495983f763b2f6e6ebb3cecb552f3bc
 Patch0:		%{name}-sh.patch
 URL:		https://github.com/hughsie/fwupd
 BuildRequires:	appstream-glib-devel >= 0.5.10
@@ -33,7 +33,7 @@ BuildRequires:	gtk-doc >= 1.14
 BuildRequires:	intltool >= 0.35.0
 BuildRequires:	libarchive-devel
 BuildRequires:	libgpg-error-devel
-BuildRequires:	libgusb-devel >= 0.2.8
+BuildRequires:	libgusb-devel >= 0.2.9
 BuildRequires:	libsoup-devel >= 2.52
 BuildRequires:	libtool
 BuildRequires:	libxslt-progs
@@ -48,7 +48,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 Requires:	appstream-glib >= 0.5.10
 %{?with_colorhug:Requires:	colord-libs >= 1.2.12}
 %{?with_efi:Requires:	fwupdate-libs >= 0.5}
-Requires:	libgusb >= 0.2.8
+Requires:	libgusb >= 0.2.9
 Requires:	libsoup >= 2.52
 Requires:	polkit >= 0.103
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -163,6 +163,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libexecdir}/fwupd
 %dir %{_libdir}/fwupd-plugins-1
 %attr(755,root,root) %{_libdir}/fwupd-plugins-1/libfu_plugin_test.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-1/libfu_plugin_steelseries.so
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd.conf
 %dir /etc/pki/fwupd
 /etc/pki/fwupd/GPG-KEY-Hughski-Limited
@@ -201,7 +202,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libfwupd.so
 %attr(755,root,root) %{_libdir}/libdfu.so
+%{_includedir}/dfu.h
 %{_includedir}/fwupd-1
+%{_includedir}/libdfu
 %{_datadir}/gir-1.0/Dfu-1.0.gir
 %{_datadir}/gir-1.0/Fwupd-1.0.gir
 %{_datadir}/dbus-1/interfaces/org.freedesktop.fwupd.xml
@@ -218,3 +221,4 @@ rm -rf $RPM_BUILD_ROOT
 %files apidocs
 %defattr(644,root,root,755)
 %{_gtkdocdir}/libdfu
+%{_gtkdocdir}/libfwupd
