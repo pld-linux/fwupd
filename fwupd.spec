@@ -3,7 +3,7 @@
 %bcond_without	colorhug	# ColorHug support
 %bcond_without	efi		# UEFI support
 %bcond_without	static_libs	# static library
-#
+
 %ifnarch %{ix86} %{x8664} arm aarch64 ia64
 %undefine	with_efi
 %endif
@@ -11,7 +11,7 @@ Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
 Version:	0.7.0
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
@@ -106,6 +106,9 @@ Statyczne biblioteki fwupd.
 Summary:	API documentation for fwupd libraries
 Summary(pl.UTF-8):	Dokumentacja API do bibliotek fwupd
 Group:		Documentation
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description apidocs
 API documentation for fwupd libraries.
