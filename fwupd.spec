@@ -11,7 +11,7 @@ Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
 Version:	0.7.2
-Release:	2
+Release:	3
 License:	GPL v2
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
