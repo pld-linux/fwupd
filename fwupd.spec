@@ -4,6 +4,7 @@
 %bcond_without	colorhug	# ColorHug support
 %bcond_without	efi		# UEFI (and dell) support
 %bcond_without	static_libs	# static library
+%bcond_without	thunderbolt	# Thunderbolt support
 
 %ifnarch %{ix86} %{x8664} %{arm} aarch64 ia64
 %undefine	with_efi
@@ -41,6 +42,8 @@ BuildRequires:	libgusb-devel >= 0.2.9
 # for dell (which depends on fwupdate too)
 %{?with_efi:BuildRequires:	libsmbios-devel >= 2.3.0}
 BuildRequires:	libsoup-devel >= 2.52
+# pkgconfig(libtbtfwu) >= 1
+%{?with_thunderbolt:BuildRequires:	libtbtfwu-devel >= 0-0.2017.01.19}
 BuildRequires:	libtool >= 2:2
 BuildRequires:	libxslt-progs
 BuildRequires:	pkgconfig
@@ -135,6 +138,7 @@ Dokumentacja API do bibliotek fwupd.
 %configure \
 	--disable-silent-rules \
 	%{!?with_static_libs:--disable-static} \
+	%{!?with_thunderbolt:--disable-thunderbolt} \
 	%{!?with_efi:--disable-uefi} \
 	--with-html-dir=%{_gtkdocdir} \
 	--with-systemdunitdir=%{systemdunitdir}
@@ -180,6 +184,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_steelseries.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_synapticsmst.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_test.so
+%if %{with thunderbolt}
+%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_thunderbolt.so
+%endif
 %attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_udev.so
 %if %{with efi}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_uefi.so
