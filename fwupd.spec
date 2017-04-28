@@ -1,4 +1,4 @@
-# TODO: libtbtfwu >= 1, polkit >= 0.114 when available
+# TODO: polkit >= 0.114 when available
 #
 # Conditional build:
 %bcond_without	colorhug	# ColorHug support
@@ -12,12 +12,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	0.8.1
+Version:	0.8.2
 Release:	1
 License:	GPL v2
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	067fedb99a40e8c877bd9c25ee3ca8e6
+# Source0-md5:	e006616f44ea1a5c53adbfd63075fa83
 Patch0:		%{name}-sh.patch
 URL:		https://github.com/hughsie/fwupd
 BuildRequires:	appstream-glib-devel >= 0.5.10
@@ -212,9 +212,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/dbus-1/system-services/org.freedesktop.fwupd.service
 %{_datadir}/polkit-1/actions/org.freedesktop.fwupd.policy
 %{_datadir}/polkit-1/rules.d/org.freedesktop.fwupd.rules
-%dir /var/cache/app-info
-%dir /var/cache/app-info/icons
-%dir /var/cache/app-info/xmls
 %dir /var/lib/fwupd
 %{_mandir}/man1/dfu-tool.1*
 %{_mandir}/man1/fwupdmgr.1*
