@@ -3,7 +3,6 @@
 # Conditional build:
 %bcond_without	colorhug	# ColorHug support
 %bcond_without	efi		# UEFI (and dell) support
-%bcond_without	static_libs	# static library
 %bcond_without	thunderbolt	# Thunderbolt support
 
 %ifnarch %{ix86} %{x8664} %{arm} aarch64 ia64
@@ -12,17 +11,15 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	0.8.2
+Version:	0.9.2
 Release:	1
-License:	GPL v2
+License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	e006616f44ea1a5c53adbfd63075fa83
-Patch0:		%{name}-sh.patch
+# Source0-md5:	1e424f3d722ac4b4984cf73bd36947b8
+Patch0:		%{name}-its.patch
 URL:		https://github.com/hughsie/fwupd
 BuildRequires:	appstream-glib-devel >= 0.5.10
-BuildRequires:	autoconf >= 2.63
-BuildRequires:	automake >= 1:1.9
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.12}
 BuildRequires:	docbook-utils
 %{?with_efi:BuildRequires:	efivar-devel}
@@ -30,7 +27,7 @@ BuildRequires:	docbook-utils
 BuildRequires:	elfutils-devel >= 0.166
 %{?with_efi:BuildRequires:	fwupdate-devel >= 5}
 BuildRequires:	gcab-devel
-BuildRequires:	gettext-tools >= 0.17
+BuildRequires:	gettext-tools >= 0.19.7
 BuildRequires:	glib2-devel >= 1:2.45.8
 BuildRequires:	gobject-introspection-devel >= 0.9.8
 BuildRequires:	gpgme-devel
@@ -44,13 +41,15 @@ BuildRequires:	libgusb-devel >= 0.2.9
 BuildRequires:	libsoup-devel >= 2.52
 # pkgconfig(libtbtfwu) >= 1
 %{?with_thunderbolt:BuildRequires:	libtbtfwu-devel >= 0-0.2017.01.19}
-BuildRequires:	libtool >= 2:2
 BuildRequires:	libxslt-progs
+BuildRequires:	meson >= 0.37.0
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.103
 BuildRequires:	rpmbuild(macros) >= 1.644
 BuildRequires:	sqlite3-devel >= 3
+BuildRequires:	systemd-units
 BuildRequires:	tar >= 1:1.22
+BuildRequires:	udev-devel
 BuildRequires:	udev-glib-devel
 BuildRequires:	xz
 Requires:	%{name}-libs = %{version}-%{release}
@@ -92,24 +91,13 @@ Summary(pl.UTF-8):	Pliki nagłówkowe bibliotek fwupd
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	glib2-devel >= 1:2.45.8
+Obsoletes:	fwupd-static
 
 %description devel
 Header files for fwupd libraries.
 
 %description devel -l pl.UTF-8
 Pliki nagłówkowe bibliotek fwupd.
-
-%package static
-Summary:	Static fwupd libraries
-Summary(pl.UTF-8):	Statyczne biblioteki fwupd
-Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}-%{release}
-
-%description static
-Static fwupd libraries.
-
-%description static -l pl.UTF-8
-Statyczne biblioteki fwupd.
 
 %package apidocs
 Summary:	API documentation for fwupd libraries
@@ -130,33 +118,30 @@ Dokumentacja API do bibliotek fwupd.
 %patch0 -p1
 
 %build
-%{__libtoolize}
-%{__aclocal} -I m4
-%{__autoconf}
-%{__autoheader}
-%{__automake}
-%configure \
-	--disable-silent-rules \
-	%{!?with_static_libs:--disable-static} \
-	%{!?with_thunderbolt:--disable-thunderbolt} \
-	%{!?with_efi:--disable-uefi} \
-	--with-html-dir=%{_gtkdocdir} \
-	--with-systemdunitdir=%{systemdunitdir}
-%{__make}
+CC="%{__cc}" \
+CFLAGS="%{rpmcflags} %{rpmcppflags}" \
+LDFLAGS="%{rpmldflags}" \
+meson build \
+	--buildtype=plain \
+	--prefix=%{_prefix} \
+	--libdir=%{_libdir} \
+	--libexecdir=%{_libexecdir} \
+	--localstatedir=%{_localstatedir} \
+	--sysconfdir=%{_sysconfdir} \
+	-Denable-tests=false \
+	%{!?with_thunderbolt:-Denable-thunderbolt=false} \
+	%{!?with_efi:-Denable-uefi=false}
+
+ninja -C build -v
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT
+DESTDIR=$RPM_BUILD_ROOT \
+ninja -C build -v install
 
-# obsoleted by pkg-config
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/lib{dfu,fwupd}.la
-# loadable modules
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/fwupd-plugins-2/lib*.la
-%if %{with static_libs}
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/fwupd-plugins-2/lib*.a
-%endif
+install -d $RPM_BUILD_ROOT%{_gtkdocdir}
+%{__mv} $RPM_BUILD_ROOT%{_datadir}/gtk-doc/html/* $RPM_BUILD_ROOT%{_gtkdocdir}
 
 %find_lang %{name}
 
@@ -237,13 +222,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/dbus-1/interfaces/org.freedesktop.fwupd.xml
 %{_pkgconfigdir}/dfu.pc
 %{_pkgconfigdir}/fwupd.pc
-
-%if %{with static_libs}
-%files static
-%defattr(644,root,root,755)
-%{_libdir}/libdfu.a
-%{_libdir}/libfwupd.a
-%endif
 
 %files apidocs
 %defattr(644,root,root,755)
