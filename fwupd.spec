@@ -8,6 +8,9 @@
 %ifnarch %{ix86} %{x8664} %{arm} aarch64 ia64
 %undefine	with_efi
 %endif
+%if %{without efi}
+%undefine	with_thunderbolt
+%endif
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
@@ -22,6 +25,7 @@ URL:		https://github.com/hughsie/fwupd
 BuildRequires:	appstream-glib-devel >= 0.5.10
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.12}
 BuildRequires:	docbook-utils
+BuildRequires:	docbook-dtd41-sgml
 %{?with_efi:BuildRequires:	efivar-devel}
 # pkgconfig(libelf); can be also libelf-devel
 BuildRequires:	elfutils-devel >= 0.166
@@ -43,6 +47,7 @@ BuildRequires:	libsoup-devel >= 2.52
 %{?with_thunderbolt:BuildRequires:	libtbtfwu-devel >= 0-0.2017.01.19}
 BuildRequires:	libxslt-progs
 BuildRequires:	meson >= 0.37.0
+BuildRequires:	ninja >= 1.6
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.103
 BuildRequires:	rpmbuild(macros) >= 1.644
@@ -130,7 +135,8 @@ meson build \
 	--sysconfdir=%{_sysconfdir} \
 	-Denable-tests=false \
 	%{!?with_thunderbolt:-Denable-thunderbolt=false} \
-	%{!?with_efi:-Denable-uefi=false}
+	%{!?with_efi:-Denable-uefi=false} \
+	%{!?with_efi:-Denable-dell=false}
 
 ninja -C build -v
 
@@ -167,7 +173,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_ebitdo.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_raspberrypi.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_steelseries.so
+%if %{with efi}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_synapticsmst.so
+%endif
 %attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_test.so
 %if %{with thunderbolt}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_thunderbolt.so
