@@ -5,7 +5,7 @@
 %bcond_without	efi		# UEFI (and dell) support
 %bcond_without	thunderbolt	# Thunderbolt support
 
-%ifnarch %{ix86} %{x8664} %{arm} aarch64 ia64
+%ifnarch %{ix86} %{x8664} x32 %{arm} aarch64 ia64
 %undefine	with_efi
 %endif
 %if %{without efi}
