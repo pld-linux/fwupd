@@ -14,13 +14,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	0.9.2
+Version:	1.0.0
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	1e424f3d722ac4b4984cf73bd36947b8
-Patch0:		%{name}-its.patch
+# Source0-md5:	4be8a19aa26f067c5ad65b1e42879587
 URL:		https://github.com/hughsie/fwupd
 BuildRequires:	appstream-glib-devel >= 0.5.10
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.12}
@@ -50,7 +49,9 @@ BuildRequires:	meson >= 0.37.0
 BuildRequires:	ninja >= 1.6
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.103
-BuildRequires:	rpmbuild(macros) >= 1.644
+BuildRequires:	python3-pillow
+BuildRequires:	python3-pycairo
+BuildRequires:	rpmbuild(macros) >= 1.726
 BuildRequires:	sqlite3-devel >= 3
 BuildRequires:	systemd-units
 BuildRequires:	tar >= 1:1.22
@@ -120,34 +121,21 @@ Dokumentacja API do bibliotek fwupd.
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
-CC="%{__cc}" \
-CFLAGS="%{rpmcflags} %{rpmcppflags}" \
-LDFLAGS="%{rpmldflags}" \
-meson build \
-	--buildtype=plain \
-	--prefix=%{_prefix} \
-	--libdir=%{_libdir} \
-	--libexecdir=%{_libexecdir} \
-	--localstatedir=%{_localstatedir} \
-	--sysconfdir=%{_sysconfdir} \
+%meson \
 	-Denable-tests=false \
 	%{!?with_thunderbolt:-Denable-thunderbolt=false} \
 	%{!?with_efi:-Denable-uefi=false} \
-	%{!?with_efi:-Denable-dell=false}
+	%{!?with_efi:-Denable-dell=false} \
+	. build
 
-ninja -C build -v
+%meson_build -C build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-DESTDIR=$RPM_BUILD_ROOT \
-ninja -C build -v install
-
-install -d $RPM_BUILD_ROOT%{_gtkdocdir}
-%{__mv} $RPM_BUILD_ROOT%{_datadir}/gtk-doc/html/* $RPM_BUILD_ROOT%{_gtkdocdir}
+%meson_install -C build
 
 %find_lang %{name}
 
@@ -163,75 +151,78 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/dfu-tool
 %attr(755,root,root) %{_bindir}/fwupdmgr
 %attr(755,root,root) %{_libexecdir}/fwupd
-%dir %{_libdir}/fwupd-plugins-2
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_altos.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_colorhug.so
+%dir %{_libdir}/fwupd-plugins-3
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_altos.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_amt.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_colorhug.so
 %if %{with efi}
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_dell.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dell.so
 %endif
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_dfu.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_ebitdo.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_raspberrypi.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_steelseries.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dfu.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ebitdo.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_raspberrypi.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_steelseries.so
 %if %{with efi}
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_synapticsmst.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synapticsmst.so
 %endif
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_test.so
 %if %{with thunderbolt}
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_thunderbolt.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_thunderbolt.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_thunderbolt_power.so
 %endif
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_udev.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_udev.so
 %if %{with efi}
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_uefi.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_uefi.so
 %endif
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_unifying.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_upower.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-2/libfu_plugin_usb.so
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd.conf
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_unifying.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_upower.so
+%dir %{_sysconfdir}/fwupd
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
+%dir %{_sysconfdir}/fwupd/remotes.d
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/fwupd.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs-testing.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/vendor.conf
 %dir /etc/pki/fwupd
 /etc/pki/fwupd/GPG-KEY-Hughski-Limited
 /etc/pki/fwupd/GPG-KEY-Linux-Vendor-Firmware-Service
+/etc/pki/fwupd/LVFS-CA.pem
 %dir /etc/pki/fwupd-metadata
 /etc/pki/fwupd-metadata/GPG-KEY-Linux-Vendor-Firmware-Service
+/etc/pki/fwupd-metadata/LVFS-CA.pem
 %{systemdunitdir}/fwupd.service
 %{systemdunitdir}/fwupd-offline-update.service
 %{systemdunitdir}/system-update.target.wants/fwupd-offline-update.service
 /lib/udev/rules.d/90-fwupd-devices.rules
 /etc/dbus-1/system.d/org.freedesktop.fwupd.conf
-# XXX: dir shared with AppStream
-%dir %{_datadir}/app-info
-%dir %{_datadir}/app-info/xmls
-%{_datadir}/app-info/xmls/org.freedesktop.fwupd.xml
 %{_datadir}/dbus-1/system-services/org.freedesktop.fwupd.service
+%dir %{_datadir}/fwupd
+%attr(755,root,root) %{_datadir}/fwupd/firmware-packager
+%dir %{_datadir}/fwupd/remotes.d
+%{_datadir}/fwupd/remotes.d/fwupd
+%{_datadir}/fwupd/remotes.d/vendor
+%{_datadir}/metainfo/org.freedesktop.fwupd.metainfo.xml
 %{_datadir}/polkit-1/actions/org.freedesktop.fwupd.policy
 %{_datadir}/polkit-1/rules.d/org.freedesktop.fwupd.rules
 %dir /var/lib/fwupd
+%dir /var/lib/fwupd/builder
+/var/lib/fwupd/builder/README.md
 %{_mandir}/man1/dfu-tool.1*
 %{_mandir}/man1/fwupdmgr.1*
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libdfu.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libdfu.so.1
+%{_libdir}/girepository-1.0/Fwupd-2.0.typelib
 %attr(755,root,root) %{_libdir}/libfwupd.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libfwupd.so.1
-%{_libdir}/girepository-1.0/Dfu-1.0.typelib
-%{_libdir}/girepository-1.0/Fwupd-1.0.typelib
+%attr(755,root,root) %ghost %{_libdir}/libfwupd.so.2
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libfwupd.so
-%attr(755,root,root) %{_libdir}/libdfu.so
-%{_includedir}/dfu.h
 %{_includedir}/fwupd-1
-%{_includedir}/libdfu
-%{_datadir}/gir-1.0/Dfu-1.0.gir
-%{_datadir}/gir-1.0/Fwupd-1.0.gir
+%{_datadir}/gir-1.0/Fwupd-2.0.gir
 %{_datadir}/dbus-1/interfaces/org.freedesktop.fwupd.xml
-%{_pkgconfigdir}/dfu.pc
 %{_pkgconfigdir}/fwupd.pc
 
 %files apidocs
 %defattr(644,root,root,755)
-%{_gtkdocdir}/libdfu
 %{_gtkdocdir}/libfwupd
