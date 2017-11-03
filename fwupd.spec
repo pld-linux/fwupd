@@ -123,12 +123,11 @@ Dokumentacja API do bibliotek fwupd.
 %setup -q
 
 %build
-%meson \
+%meson build \
 	-Denable-tests=false \
 	%{!?with_thunderbolt:-Denable-thunderbolt=false} \
 	%{!?with_efi:-Denable-uefi=false} \
-	%{!?with_efi:-Denable-dell=false} \
-	. build
+	%{!?with_efi:-Denable-dell=false}
 
 %meson_build -C build
 
