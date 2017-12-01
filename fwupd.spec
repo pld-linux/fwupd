@@ -14,12 +14,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.0.1
+Version:	1.0.2
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	248c26e0daac6f4d193f68fea3a14dad
+# Source0-md5:	9e5986756383b227ba78f0afce4b1ace
 URL:		https://github.com/hughsie/fwupd
 BuildRequires:	appstream-glib-devel >= 0.5.10
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.12}
@@ -159,6 +159,7 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dfu.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ebitdo.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nitrokey.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_raspberrypi.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_steelseries.so
 %if %{with efi}
