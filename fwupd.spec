@@ -14,12 +14,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.0.2
+Version:	1.0.4
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	9e5986756383b227ba78f0afce4b1ace
+# Source0-md5:	356571a340eb7f1679773705918b199a
 URL:		https://github.com/hughsie/fwupd
 BuildRequires:	appstream-glib-devel >= 0.5.10
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.12}
@@ -154,6 +154,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_altos.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_amt.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_colorhug.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_csr.so
 %if %{with efi}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dell.so
 %endif
@@ -197,9 +198,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/dbus-1/system-services/org.freedesktop.fwupd.service
 %dir %{_datadir}/fwupd
 %attr(755,root,root) %{_datadir}/fwupd/firmware-packager
-%dir %{_datadir}/fwupd/quirks.d
-%{_datadir}/fwupd/quirks.d/dell.quirk
-%{_datadir}/fwupd/quirks.d/dfu.quirk
+%{_datadir}/fwupd/quirks.d
 %dir %{_datadir}/fwupd/remotes.d
 %{_datadir}/fwupd/remotes.d/fwupd
 %{_datadir}/fwupd/remotes.d/vendor
