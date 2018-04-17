@@ -14,12 +14,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.0.4
+Version:	1.0.6
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	356571a340eb7f1679773705918b199a
+# Source0-md5:	d930d73d22cb4623c2817b97cad4a6e2
 URL:		https://github.com/hughsie/fwupd
 BuildRequires:	appstream-glib-devel >= 0.5.10
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.12}
@@ -161,7 +161,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dfu.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ebitdo.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nitrokey.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_raspberrypi.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_steelseries.so
 %if %{with efi}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synapticsmst.so
@@ -178,6 +177,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_upower.so
 %dir %{_sysconfdir}/fwupd
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi.conf
 %dir %{_sysconfdir}/fwupd/remotes.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/fwupd.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs-testing.conf
