@@ -14,14 +14,14 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.0.6
+Version:	1.0.7
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	d930d73d22cb4623c2817b97cad4a6e2
+# Source0-md5:	0b5d2cb50bcb05139f2528d01aed8bde
 URL:		https://github.com/hughsie/fwupd
-BuildRequires:	appstream-glib-devel >= 0.5.10
+BuildRequires:	appstream-glib-devel >= 0.7.4
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.12}
 BuildRequires:	docbook-utils
 BuildRequires:	docbook-dtd41-sgml
@@ -59,7 +59,7 @@ BuildRequires:	udev-devel
 BuildRequires:	udev-glib-devel
 BuildRequires:	xz
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	appstream-glib >= 0.5.10
+Requires:	appstream-glib >= 0.7.4
 %{?with_colorhug:Requires:	colord-libs >= 1.2.12}
 %{?with_efi:Requires:	fwupdate-libs >= 5}
 Requires:	libgusb >= 0.2.9
@@ -203,6 +203,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/fwupd/remotes.d/fwupd
 %{_datadir}/fwupd/remotes.d/vendor
 %{_datadir}/metainfo/org.freedesktop.fwupd.metainfo.xml
+%{_datadir}/metainfo/org.freedesktop.fwupd.remotes.lvfs-testing.metainfo.xml
+%{_datadir}/metainfo/org.freedesktop.fwupd.remotes.lvfs.metainfo.xml
 %{_datadir}/polkit-1/actions/org.freedesktop.fwupd.policy
 %{_datadir}/polkit-1/rules.d/org.freedesktop.fwupd.rules
 %dir /var/lib/fwupd
