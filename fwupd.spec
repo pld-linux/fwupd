@@ -14,17 +14,17 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.0.7
+Version:	1.0.8
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	0b5d2cb50bcb05139f2528d01aed8bde
+# Source0-md5:	6965473972ee7858bd6df1a80123c444
 URL:		https://github.com/hughsie/fwupd
 BuildRequires:	appstream-glib-devel >= 0.7.4
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.12}
-BuildRequires:	docbook-utils
 BuildRequires:	docbook-dtd41-sgml
+BuildRequires:	docbook-utils
 %{?with_efi:BuildRequires:	efivar-devel}
 # pkgconfig(libelf); can be also libelf-devel
 BuildRequires:	elfutils-devel >= 0.166
@@ -175,6 +175,7 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_unifying.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_upower.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_wacomhid.so
 %dir %{_sysconfdir}/fwupd
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi.conf
@@ -183,13 +184,15 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs-testing.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/vendor.conf
-%dir /etc/pki/fwupd
-/etc/pki/fwupd/GPG-KEY-Hughski-Limited
-/etc/pki/fwupd/GPG-KEY-Linux-Vendor-Firmware-Service
-/etc/pki/fwupd/LVFS-CA.pem
-%dir /etc/pki/fwupd-metadata
-/etc/pki/fwupd-metadata/GPG-KEY-Linux-Vendor-Firmware-Service
-/etc/pki/fwupd-metadata/LVFS-CA.pem
+%dir %{_sysconfdir}/pki/fwupd
+%{_sysconfdir}/pki/fwupd/GPG-KEY-Hughski-Limited
+%{_sysconfdir}/pki/fwupd/GPG-KEY-Linux-Foundation-Firmware
+%{_sysconfdir}/pki/fwupd/GPG-KEY-Linux-Vendor-Firmware-Service
+%{_sysconfdir}/pki/fwupd/LVFS-CA.pem
+%dir %{_sysconfdir}/pki/fwupd-metadata
+%{_sysconfdir}/pki/fwupd-metadata/GPG-KEY-Linux-Foundation-Metadata
+%{_sysconfdir}/pki/fwupd-metadata/GPG-KEY-Linux-Vendor-Firmware-Service
+%{_sysconfdir}/pki/fwupd-metadata/LVFS-CA.pem
 %{systemdunitdir}/fwupd.service
 %{systemdunitdir}/fwupd-offline-update.service
 %{systemdunitdir}/system-update.target.wants/fwupd-offline-update.service
@@ -203,8 +206,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/fwupd/remotes.d/fwupd
 %{_datadir}/fwupd/remotes.d/vendor
 %{_datadir}/metainfo/org.freedesktop.fwupd.metainfo.xml
-%{_datadir}/metainfo/org.freedesktop.fwupd.remotes.lvfs-testing.metainfo.xml
-%{_datadir}/metainfo/org.freedesktop.fwupd.remotes.lvfs.metainfo.xml
+%dir %{_datadir}/fwupd/metainfo
+%{_datadir}/fwupd/metainfo/org.freedesktop.fwupd.remotes.lvfs-testing.metainfo.xml
+%{_datadir}/fwupd/metainfo/org.freedesktop.fwupd.remotes.lvfs.metainfo.xml
 %{_datadir}/polkit-1/actions/org.freedesktop.fwupd.policy
 %{_datadir}/polkit-1/rules.d/org.freedesktop.fwupd.rules
 %dir /var/lib/fwupd
@@ -230,3 +234,4 @@ rm -rf $RPM_BUILD_ROOT
 %files apidocs
 %defattr(644,root,root,755)
 %{_gtkdocdir}/libfwupd
+
