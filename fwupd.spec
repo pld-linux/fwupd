@@ -40,7 +40,10 @@ BuildRequires:	libarchive-devel
 BuildRequires:	libgpg-error-devel
 BuildRequires:	libgusb-devel >= 0.2.9
 # for dell (which depends on fwupdate too)
-%{?with_efi:BuildRequires:	libsmbios-devel >= 2.3.0}
+%if %{with efi}
+BuildRequires:	gnu-efi
+BuildRequires:	libsmbios-devel >= 2.3.0
+%endif
 BuildRequires:	libsoup-devel >= 2.52
 # pkgconfig(libtbtfwu) >= 1
 %{?with_thunderbolt:BuildRequires:	libtbtfwu-devel >= 0-0.2017.01.19}
