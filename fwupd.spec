@@ -14,12 +14,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.1.0
+Version:	1.1.2
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	545d1a204307a27f41ef9ed7b197b45f
+# Source0-md5:	e384fa6669ba264065458677a7a4ee40
 URL:		https://github.com/hughsie/fwupd
 BuildRequires:	appstream-glib-devel >= 0.7.4
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.12}
@@ -164,9 +164,12 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dell_esrt.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dfu.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ebitdo.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_flashrom.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nitrokey.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nvme.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_redfish.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_steelseries.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_superio.so
 %if %{with efi}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synapticsmst.so
 %endif
@@ -184,6 +187,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/fwupd
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
 %dir %{_sysconfdir}/fwupd/remotes.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/fwupd.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs-testing.conf
