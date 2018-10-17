@@ -32,6 +32,9 @@ BuildRequires:	elfutils-devel >= 0.166
 BuildRequires:	gcab-devel >= 1.0
 # C99
 BuildRequires:	gcc >= 5:3.2
+%ifarch x32
+BuildRequires:	gcc-multilib-64 >= 5:3.2
+%endif
 BuildRequires:	gettext-tools >= 0.19.7
 BuildRequires:	glib2-devel >= 1:2.55.0
 %{?with_efi:BuildRequires:	gnu-efi}
@@ -160,6 +163,11 @@ API języka Vala do biblioteki fwupd.
 %prep
 %setup -q
 %patch0 -p1
+
+%ifarch x32
+# -m64 is needed to build x64 EFI
+%{__sed} -i -e "/^if efi_arch == 'x86_64'/,/^elif/ s/'-mno-red-zone',/& '-m64',/" plugins/uefi/efi/meson.build
+%endif
 
 %build
 %meson build \
