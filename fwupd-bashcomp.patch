@@ -1,0 +1,23 @@
+--- fwupd-1.1.3/meson_options.txt.orig	2018-10-12 13:20:10.000000000 +0200
++++ fwupd-1.1.3/meson_options.txt	2018-10-17 17:11:30.171600448 +0200
+@@ -24,3 +24,4 @@
+ option('efi-libdir', type : 'string', description : 'path to the EFI lib directory')
+ option('efi-ldsdir', type : 'string', description : 'path to the EFI lds directory')
+ option('efi-includedir', type : 'string', value : '/usr/include/efi', description : 'path to the EFI header directory')
++option('bash_completiondir', type : 'string', value : '')
+--- fwupd-1.1.3/data/bash-completion/meson.build.orig	2018-10-17 17:20:45.844927437 +0200
++++ fwupd-1.1.3/data/bash-completion/meson.build	2018-10-17 17:20:49.401594061 +0200
+@@ -1,8 +1,12 @@
+-if bashcomp.found()
++tgt = get_option('bash_completiondir')
++
++if tgt == '' and bashcomp.found()
+   tgt = bashcomp.get_pkgconfig_variable('completionsdir',
+                                          define_variable: [ 'prefix', prefix ],
+   )
++endif
+ 
++if tgt != ''
+ 
+ if get_option('daemon')
+     install_data(['fwupdmgr'],
