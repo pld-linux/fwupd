@@ -10,15 +10,14 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.1.3
-Release:	2
+Version:	1.2.0
+Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	3f76eadf496d21b547d46299f925ecf3
+# Source0-md5:	bd10434fb4c2793398b055b403669801
 Patch0:		%{name}-bashcomp.patch
 URL:		https://github.com/hughsie/fwupd
-BuildRequires:	appstream-glib-devel >= 0.7.4
 %{?with_cairo:BuildRequires:	cairo-devel}
 %{?with_colorhug:BuildRequires:	colord-devel >= 1.2.12}
 BuildRequires:	docbook-dtd41-sgml
@@ -52,10 +51,11 @@ BuildRequires:	libgusb-devel >= 0.2.9
 %{?with_efi:BuildRequires:	libsmbios-devel >= 2.4.0}
 BuildRequires:	libsoup-devel >= 2.52
 BuildRequires:	libuuid-devel
+BuildRequires:	libxmlb-devel >= 0.1.3
 BuildRequires:	libxslt-progs
 # for <linux/nvme_ioctl.h>
 BuildRequires:	linux-libc-headers >= 7:4.4
-BuildRequires:	meson >= 0.43.0
+BuildRequires:	meson >= 0.46.0
 BuildRequires:	ninja >= 1.6
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.114
@@ -69,7 +69,6 @@ BuildRequires:	udev-devel
 %{?with_thunderbolt:BuildRequires:	umockdev-devel}
 BuildRequires:	xz
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	appstream-glib >= 0.7.4
 %{?with_colorhug:Requires:	colord-libs >= 1.2.12}
 %{?with_efi:Requires:	fwupdate-libs >= 5}
 Requires:	gcab >= 1.0
@@ -78,6 +77,7 @@ Requires:	libgudev >= 232
 Requires:	libgusb >= 0.2.9
 %{?with_efi:Requires:	libsmbios >= 2.4.0}
 Requires:	libsoup >= 2.52
+Requires:	libxmlb >= 0.1.3
 Requires:	polkit >= 0.114
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -281,6 +281,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/polkit-1/rules.d/org.freedesktop.fwupd.rules
 %lang(ca) %{_localedir}/ca/LC_IMAGES
 %lang(cs) %{_localedir}/cs/LC_IMAGES
+%lang(de) %{_localedir}/de/LC_IMAGES
 %lang(en) %{_localedir}/en/LC_IMAGES
 %lang(fi) %{_localedir}/fi/LC_IMAGES
 %lang(fur) %{_localedir}/fur/LC_IMAGES
