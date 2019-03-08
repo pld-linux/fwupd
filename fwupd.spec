@@ -10,12 +10,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.2.0
+Version:	1.2.5
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	bd10434fb4c2793398b055b403669801
+# Source0-md5:	c3404e0624a4a3e1efce07f95e910e28
 Patch0:		%{name}-bashcomp.patch
 URL:		https://github.com/hughsie/fwupd
 %{?with_cairo:BuildRequires:	cairo-devel}
@@ -51,7 +51,7 @@ BuildRequires:	libgusb-devel >= 0.2.9
 %{?with_efi:BuildRequires:	libsmbios-devel >= 2.4.0}
 BuildRequires:	libsoup-devel >= 2.52
 BuildRequires:	libuuid-devel
-BuildRequires:	libxmlb-devel >= 0.1.3
+BuildRequires:	libxmlb-devel >= 0.1.5
 BuildRequires:	libxslt-progs
 # for <linux/nvme_ioctl.h>
 BuildRequires:	linux-libc-headers >= 7:4.4
@@ -77,7 +77,7 @@ Requires:	libgudev >= 232
 Requires:	libgusb >= 0.2.9
 %{?with_efi:Requires:	libsmbios >= 2.4.0}
 Requires:	libsoup >= 2.52
-Requires:	libxmlb >= 0.1.3
+Requires:	libxmlb >= 0.1.5
 Requires:	polkit >= 0.114
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -200,7 +200,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -f %{name}.lang
 %defattr(644,root,root,755)
-%doc AUTHORS MAINTAINERS NEWS README.md README-*.md
+%doc AUTHORS MAINTAINERS README.md README-*.md
 %attr(755,root,root) %{_bindir}/dfu-tool
 %attr(755,root,root) %{_bindir}/fwupdmgr
 %dir %{_libexecdir}/fwupd
@@ -212,6 +212,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/fwupd-plugins-3
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_altos.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_amt.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ata.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_colorhug.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_csr.so
 %if %{with efi}
@@ -221,6 +222,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dell_dock.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dfu.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ebitdo.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_fastboot.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_flashrom.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nitrokey.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nvme.so
@@ -242,16 +244,19 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_unifying.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_upower.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_wacomhid.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_wacom_raw.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_wacom_usb.so
 %dir %{_sysconfdir}/fwupd
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi.conf
 %dir %{_sysconfdir}/fwupd/remotes.d
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/fwupd.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/fwupd-tests.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs-testing.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/vendor.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/vendor-directory.conf
 %dir %{_sysconfdir}/pki/fwupd
 %{_sysconfdir}/pki/fwupd/GPG-KEY-Hughski-Limited
 %{_sysconfdir}/pki/fwupd/GPG-KEY-Linux-Foundation-Firmware
