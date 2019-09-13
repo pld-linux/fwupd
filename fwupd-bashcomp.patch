@@ -1,9 +1,9 @@
---- fwupd-1.1.3/meson_options.txt.orig	2018-10-12 13:20:10.000000000 +0200
-+++ fwupd-1.1.3/meson_options.txt	2018-10-17 17:11:30.171600448 +0200
-@@ -24,3 +24,4 @@
- option('efi-libdir', type : 'string', description : 'path to the EFI lib directory')
+--- fwupd-1.2.10/meson_options.txt.orig	2019-09-13 06:06:30.006025055 +0200
++++ fwupd-1.2.10/meson_options.txt	2019-09-13 15:48:25.670204020 +0200
+@@ -30,3 +30,4 @@
  option('efi-ldsdir', type : 'string', description : 'path to the EFI lds directory')
  option('efi-includedir', type : 'string', value : '/usr/include/efi', description : 'path to the EFI header directory')
+ option('efi_os_dir', type: 'string', description : 'the name of OS directory in ESP')
 +option('bash_completiondir', type : 'string', value : '')
 --- fwupd-1.1.3/data/bash-completion/meson.build.orig	2018-10-17 17:20:45.844927437 +0200
 +++ fwupd-1.1.3/data/bash-completion/meson.build	2018-10-17 17:20:49.401594061 +0200

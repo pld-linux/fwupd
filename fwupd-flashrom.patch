@@ -1,0 +1,11 @@
+--- fwupd-1.2.10/meson.build.orig	2019-07-15 20:26:50.000000000 +0200
++++ fwupd-1.2.10/meson.build	2019-09-13 20:38:51.762465444 +0200
+@@ -279,7 +279,7 @@
+ endif
+ 
+ if get_option('plugin_flashrom')
+-  libflashrom = dependency('flashrom', fallback : ['flashrom', 'flashrom_dep'])
++  libflashrom = dependency('libflashrom', fallback : ['flashrom', 'flashrom_dep'])
+ endif
+ 
+ if get_option('systemd')

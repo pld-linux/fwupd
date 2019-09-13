@@ -1,7 +1,8 @@
 #
 # Conditional build:
-%bcond_without	colorhug	# ColorHug support
 %bcond_without	efi		# UEFI (and dell, redfish) support
+%bcond_without	flashrom	# flashrom plugin
+%bcond_without	modemmanager	# modem_manager plugin
 %bcond_without	thunderbolt	# Thunderbolt support
 
 %ifnarch %{ix86} %{x8664} x32 %{arm} aarch64
@@ -10,16 +11,17 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.2.5
-Release:	2
+Version:	1.2.10
+Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	c3404e0624a4a3e1efce07f95e910e28
+# Source0-md5:	71e9d8c3877091c3cc8066156b9a6823
 Patch0:		%{name}-bashcomp.patch
+Patch1:		%{name}-flashrom.patch
 URL:		https://github.com/hughsie/fwupd
+%{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.10.0}
 %{?with_cairo:BuildRequires:	cairo-devel}
-%{?with_colorhug:BuildRequires:	colord-devel >= 1.2.12}
 BuildRequires:	docbook-dtd41-sgml
 BuildRequires:	docbook-utils
 %{?with_efi:BuildRequires:	efivar-devel >= 33}
@@ -27,7 +29,6 @@ BuildRequires:	docbook-utils
 BuildRequires:	elfutils-devel >= 0.166
 %{?with_fontconfig:BuildRequires:	fontconfig-devel}
 %{?with_fontconfig:BuildRequires:	freetype-devel >= 2}
-%{?with_efi:BuildRequires:	fwupdate-devel >= 5}
 BuildRequires:	gcab-devel >= 1.0
 # C99
 BuildRequires:	gcc >= 5:3.2
@@ -37,25 +38,27 @@ BuildRequires:	gcc-multilib-64 >= 5:3.2
 BuildRequires:	gettext-tools >= 0.19.7
 BuildRequires:	glib2-devel >= 1:2.55.0
 %{?with_efi:BuildRequires:	gnu-efi}
-BuildRequires:	gnutls-devel >= 3.4.4.1
+BuildRequires:	gnutls-devel >= 3.6.0
 BuildRequires:	gobject-introspection-devel >= 0.9.8
 BuildRequires:	gpgme-devel
 BuildRequires:	gtk-doc >= 1.14
 BuildRequires:	intltool >= 0.35.0
 BuildRequires:	json-glib-devel >= 1.1.1
 BuildRequires:	libarchive-devel
+%{?with_flashrom:BuildRequires:	libflashrom-devel}
 BuildRequires:	libgpg-error-devel
 BuildRequires:	libgudev-devel >= 232
 BuildRequires:	libgusb-devel >= 0.2.9
-# for dell (which depends on fwupdate too)
+%{?with_modemmanager:BuildRequires:	libqmi-devel >= 1.22.0}
+# for dell (which requires also uefi plugin and efivar)
 %{?with_efi:BuildRequires:	libsmbios-devel >= 2.4.0}
 BuildRequires:	libsoup-devel >= 2.52
 BuildRequires:	libuuid-devel
-BuildRequires:	libxmlb-devel >= 0.1.5
+BuildRequires:	libxmlb-devel >= 0.1.7
 BuildRequires:	libxslt-progs
 # for <linux/nvme_ioctl.h>
 BuildRequires:	linux-libc-headers >= 7:4.4
-BuildRequires:	meson >= 0.46.0
+BuildRequires:	meson >= 0.47.0
 BuildRequires:	ninja >= 1.6
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.114
@@ -69,15 +72,15 @@ BuildRequires:	udev-devel
 %{?with_thunderbolt:BuildRequires:	umockdev-devel}
 BuildRequires:	xz
 Requires:	%{name}-libs = %{version}-%{release}
-%{?with_colorhug:Requires:	colord-libs >= 1.2.12}
-%{?with_efi:Requires:	fwupdate-libs >= 5}
+%{?with_modemmanager:BuildRequires:	ModemManager-libs >= 1.10.0}
 Requires:	gcab >= 1.0
-Requires:	gnutls-libs >= 3.4.4.1
+Requires:	gnutls-libs >= 3.6.0
 Requires:	libgudev >= 232
 Requires:	libgusb >= 0.2.9
+%{?with_modemmanager:Requires:	libqmi >= 1.22.0}
 %{?with_efi:Requires:	libsmbios >= 2.4.0}
 Requires:	libsoup >= 2.52
-Requires:	libxmlb >= 0.1.5
+Requires:	libxmlb >= 0.1.7
 Requires:	polkit >= 0.114
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -163,6 +166,7 @@ API języka Vala do biblioteki fwupd.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %ifarch x32
 # -m64 is needed to build x64 EFI
@@ -173,6 +177,8 @@ API języka Vala do biblioteki fwupd.
 %meson build \
 	-Dbash_completiondir=%{bash_compdir} \
 	%{!?with_efi:-Dplugin_dell=false} \
+	%{?with_flashrom:-Dplugin_flashrom=true} \
+	%{?with_modemmanager:-Dplugin_modem_manager=true} \
 	%{!?with_efi:-Dplugin_redfish=false} \
 	%{!?with_thunderbolt:-Dplugin_thunderbolt=false} \
 	%{!?with_efi:-Dplugin_uefi=false} \
@@ -205,7 +211,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/fwupdmgr
 %dir %{_libexecdir}/fwupd
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupd
+%attr(755,root,root) %{_libexecdir}/fwupd/fwupdagent
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupdate
+%attr(755,root,root) %{_libexecdir}/fwupd/fwupdoffline
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupdtool
 %dir %{_libexecdir}/fwupd/efi
 %{_libexecdir}/fwupd/efi/fwupd*.efi
@@ -223,7 +231,12 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dfu.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ebitdo.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_fastboot.so
+%if %{with flashrom}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_flashrom.so
+%endif
+%if %{with modemmanager}
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_modem_manager.so
+%endif
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nitrokey.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nvme.so
 %if %{with efi}
@@ -233,6 +246,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_rts54hub.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_steelseries.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_superio.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synaptics_prometheus.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synapticsmst.so
 %if %{with thunderbolt}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_thunderbolt.so
@@ -251,7 +265,9 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi.conf
 %dir %{_sysconfdir}/fwupd/remotes.d
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/fwupd.conf
+%if %{with efi}
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/dell-esrt.conf
+%endif
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/fwupd-tests.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs-testing.conf
@@ -269,6 +285,7 @@ rm -rf $RPM_BUILD_ROOT
 %{systemdunitdir}/fwupd.service
 %{systemdunitdir}/fwupd-offline-update.service
 %{systemdunitdir}/system-update.target.wants/fwupd-offline-update.service
+/lib/systemd/system-shutdown/fwupd.shutdown
 /lib/udev/rules.d/90-fwupd-devices.rules
 /etc/dbus-1/system.d/org.freedesktop.fwupd.conf
 %{_datadir}/dbus-1/system-services/org.freedesktop.fwupd.service
@@ -276,7 +293,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_datadir}/fwupd/firmware-packager
 %{_datadir}/fwupd/quirks.d
 %dir %{_datadir}/fwupd/remotes.d
-%{_datadir}/fwupd/remotes.d/fwupd
+%if %{with efi}
+%{_datadir}/fwupd/remotes.d/dell-esrt
+%endif
 %{_datadir}/fwupd/remotes.d/vendor
 %{_datadir}/metainfo/org.freedesktop.fwupd.metainfo.xml
 %dir %{_datadir}/fwupd/metainfo
@@ -284,8 +303,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/fwupd/metainfo/org.freedesktop.fwupd.remotes.lvfs.metainfo.xml
 %{_datadir}/polkit-1/actions/org.freedesktop.fwupd.policy
 %{_datadir}/polkit-1/rules.d/org.freedesktop.fwupd.rules
+%{_iconsdir}/hicolor/scalable/apps/org.freedesktop.fwupd.svg
 %lang(ca) %{_localedir}/ca/LC_IMAGES
 %lang(cs) %{_localedir}/cs/LC_IMAGES
+%lang(da) %{_localedir}/da/LC_IMAGES
 %lang(de) %{_localedir}/de/LC_IMAGES
 %lang(en) %{_localedir}/en/LC_IMAGES
 %lang(fi) %{_localedir}/fi/LC_IMAGES
@@ -295,6 +316,7 @@ rm -rf $RPM_BUILD_ROOT
 %lang(id) %{_localedir}/id/LC_IMAGES
 %lang(it) %{_localedir}/it/LC_IMAGES
 %lang(ko) %{_localedir}/ko/LC_IMAGES
+%lang(lt) %{_localedir}/lt/LC_IMAGES
 %lang(pl) %{_localedir}/pl/LC_IMAGES
 %lang(pt_BR) %{_localedir}/pt_BR/LC_IMAGES
 %lang(ru) %{_localedir}/ru/LC_IMAGES
@@ -311,6 +333,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n bash-completion-fwupd
 %defattr(644,root,root,755)
+%{bash_compdir}/fwupdagent
 %{bash_compdir}/fwupdmgr
 %{bash_compdir}/fwupdtool
 
