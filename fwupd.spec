@@ -1,5 +1,6 @@
 #
 # Conditional build:
+%bcond_without	apidocs
 %bcond_without	efi		# UEFI (and dell, redfish) support
 %bcond_without	flashrom	# flashrom plugin
 %bcond_without	modemmanager	# modem_manager plugin
@@ -11,12 +12,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.2.10
+Version:	1.3.7
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	71e9d8c3877091c3cc8066156b9a6823
+# Source0-md5:	ae5a9c871f18d23ca52264ea31012340
 Patch0:		%{name}-bashcomp.patch
 Patch1:		%{name}-flashrom.patch
 URL:		https://github.com/hughsie/fwupd
@@ -41,7 +42,7 @@ BuildRequires:	glib2-devel >= 1:2.55.0
 BuildRequires:	gnutls-devel >= 3.6.0
 BuildRequires:	gobject-introspection-devel >= 0.9.8
 BuildRequires:	gpgme-devel
-BuildRequires:	gtk-doc >= 1.14
+%{?with_doc:BuildRequires:	gtk-doc >= 1.14}
 BuildRequires:	intltool >= 0.35.0
 BuildRequires:	json-glib-devel >= 1.1.1
 BuildRequires:	libarchive-devel
@@ -54,7 +55,7 @@ BuildRequires:	libgusb-devel >= 0.2.9
 %{?with_efi:BuildRequires:	libsmbios-devel >= 2.4.0}
 BuildRequires:	libsoup-devel >= 2.52
 BuildRequires:	libuuid-devel
-BuildRequires:	libxmlb-devel >= 0.1.7
+BuildRequires:	libxmlb-devel >= 0.1.13
 BuildRequires:	libxslt-progs
 # for <linux/nvme_ioctl.h>
 BuildRequires:	linux-libc-headers >= 7:4.4
@@ -68,6 +69,7 @@ BuildRequires:	rpmbuild(macros) >= 1.726
 BuildRequires:	sqlite3-devel >= 3
 BuildRequires:	systemd-units >= 1:211
 BuildRequires:	tar >= 1:1.22
+BuildRequires:	tpm2-tss-devel
 BuildRequires:	udev-devel
 %{?with_thunderbolt:BuildRequires:	umockdev-devel}
 BuildRequires:	xz
@@ -176,6 +178,7 @@ API języka Vala do biblioteki fwupd.
 %build
 %meson build \
 	-Dbash_completiondir=%{bash_compdir} \
+	-Dgtkdoc=%{__true_false apidocs} \
 	%{!?with_efi:-Dplugin_dell=false} \
 	%{?with_flashrom:-Dplugin_flashrom=true} \
 	%{?with_modemmanager:-Dplugin_modem_manager=true} \
@@ -215,6 +218,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupdate
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupdoffline
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupdtool
+%attr(755,root,root) %{_libexecdir}/fwupd/fwupdtpmevlog
 %dir %{_libexecdir}/fwupd/efi
 %{_libexecdir}/fwupd/efi/fwupd*.efi
 %dir %{_libdir}/fwupd-plugins-3
@@ -222,6 +226,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_amt.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ata.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_colorhug.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_coreboot.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_csr.so
 %if %{with efi}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dell.so
@@ -230,39 +235,50 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dell_dock.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dfu.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ebitdo.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_emmc.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_fastboot.so
 %if %{with flashrom}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_flashrom.so
 %endif
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_jabra.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_logitech_hidpp.so
 %if %{with modemmanager}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_modem_manager.so
 %endif
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nitrokey.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nvme.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_optionrom.so
 %if %{with efi}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_redfish.so
 %endif
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_rts54hid.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_rts54hub.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_solokey.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_steelseries.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_superio.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synaptics_cxaudio.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synaptics_mst.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synaptics_prometheus.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synapticsmst.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synaptics_rmi.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_thelio_io.so
 %if %{with thunderbolt}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_thunderbolt.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_thunderbolt_power.so
 %endif
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_udev.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_tpm.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_tpm_eventlog.so
 %if %{with efi}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_uefi.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_uefi_recovery.so
 %endif
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_unifying.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_upower.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_vli.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_wacom_raw.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_wacom_usb.so
 %dir %{_sysconfdir}/fwupd
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/thunderbolt.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi.conf
 %dir %{_sysconfdir}/fwupd/remotes.d
 %if %{with efi}
@@ -284,13 +300,19 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pki/fwupd-metadata/LVFS-CA.pem
 %{systemdunitdir}/fwupd.service
 %{systemdunitdir}/fwupd-offline-update.service
+%{systemdunitdir}/fwupd-refresh.service
+%{systemdunitdir}/fwupd-refresh.timer
 %{systemdunitdir}/system-update.target.wants/fwupd-offline-update.service
+/lib/systemd/system-preset/fwupd-refresh.preset
 /lib/systemd/system-shutdown/fwupd.shutdown
 /lib/udev/rules.d/90-fwupd-devices.rules
-/etc/dbus-1/system.d/org.freedesktop.fwupd.conf
+%{_datadir}/dbus-1/system.d/org.freedesktop.fwupd.conf
 %{_datadir}/dbus-1/system-services/org.freedesktop.fwupd.service
 %dir %{_datadir}/fwupd
-%attr(755,root,root) %{_datadir}/fwupd/firmware-packager
+%attr(755,root,root) %{_datadir}/fwupd/add_capsule_header.py
+%attr(755,root,root) %{_datadir}/fwupd/firmware_packager.py
+%attr(755,root,root) %{_datadir}/fwupd/install_dell_bios_exe.py
+%attr(755,root,root) %{_datadir}/fwupd/simple_client.py
 %{_datadir}/fwupd/quirks.d
 %dir %{_datadir}/fwupd/remotes.d
 %if %{with efi}
@@ -340,23 +362,31 @@ rm -rf $RPM_BUILD_ROOT
 %files libs
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libfwupd.so.*.*.*
+%attr(755,root,root) %{_libdir}/libfwupdplugin.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libfwupd.so.2
+%attr(755,root,root) %ghost %{_libdir}/libfwupdplugin.so.1
 %{_libdir}/girepository-1.0/Fwupd-2.0.typelib
+%{_libdir}/girepository-1.0/FwupdPlugin-1.0.typelib
 
 %files devel
 %defattr(644,root,root,755)
 %doc libfwupd/README.md
 %attr(755,root,root) %{_libdir}/libfwupd.so
+%attr(755,root,root) %{_libdir}/libfwupdplugin.so
 %{_includedir}/fwupd-1
 %{_datadir}/gir-1.0/Fwupd-2.0.gir
+%{_datadir}/gir-1.0/FwupdPlugin-1.0.gir
 %{_datadir}/dbus-1/interfaces/org.freedesktop.fwupd.xml
 %{_pkgconfigdir}/fwupd.pc
+%{_pkgconfigdir}/fwupdplugin.pc
 
 %files apidocs
 %defattr(644,root,root,755)
-%{_gtkdocdir}/libfwupd
+%{_gtkdocdir}/fwupd
 
 %files -n vala-fwupd
 %defattr(644,root,root,755)
 %{_datadir}/vala/vapi/fwupd.deps
 %{_datadir}/vala/vapi/fwupd.vapi
+%{_datadir}/vala/vapi/fwupdplugin.deps
+%{_datadir}/vala/vapi/fwupdplugin.vapi
