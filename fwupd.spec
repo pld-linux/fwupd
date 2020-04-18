@@ -12,12 +12,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.3.7
+Version:	1.4.0
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	ae5a9c871f18d23ca52264ea31012340
+# Source0-md5:	53c57d2cde8179e25e91eaf82648d9aa
 Patch0:		%{name}-bashcomp.patch
 Patch1:		%{name}-flashrom.patch
 URL:		https://github.com/hughsie/fwupd
@@ -50,6 +50,7 @@ BuildRequires:	libarchive-devel
 BuildRequires:	libgpg-error-devel
 BuildRequires:	libgudev-devel >= 232
 BuildRequires:	libgusb-devel >= 0.2.9
+BuildRequires:	libjcat-devel >= 0.1.0
 %{?with_modemmanager:BuildRequires:	libqmi-devel >= 1.22.0}
 # for dell (which requires also uefi plugin and efivar)
 %{?with_efi:BuildRequires:	libsmbios-devel >= 2.4.0}
@@ -63,13 +64,14 @@ BuildRequires:	meson >= 0.47.0
 BuildRequires:	ninja >= 1.6
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.114
+BuildRequires:	python3 >= 1:3.0
 BuildRequires:	python3-pillow
 BuildRequires:	python3-pycairo
 BuildRequires:	rpmbuild(macros) >= 1.726
 BuildRequires:	sqlite3-devel >= 3
 BuildRequires:	systemd-units >= 1:211
 BuildRequires:	tar >= 1:1.22
-BuildRequires:	tpm2-tss-devel
+BuildRequires:	tpm2-tss-devel >= 2.0
 BuildRequires:	udev-devel
 %{?with_thunderbolt:BuildRequires:	umockdev-devel}
 BuildRequires:	xz
@@ -79,11 +81,13 @@ Requires:	gcab >= 1.0
 Requires:	gnutls-libs >= 3.6.0
 Requires:	libgudev >= 232
 Requires:	libgusb >= 0.2.9
+Requires:	libjcat >= 0.1.0
 %{?with_modemmanager:Requires:	libqmi >= 1.22.0}
 %{?with_efi:Requires:	libsmbios >= 2.4.0}
 Requires:	libsoup >= 2.52
 Requires:	libxmlb >= 0.1.7
 Requires:	polkit >= 0.114
+Requires:	tpm2-tss >= 2.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -110,6 +114,19 @@ Bash completion for fwupd commands.
 
 %description -n bash-completion-fwupd -l pl.UTF-8
 Bashowe dopełnianie składni poleceń fwupd.
+
+%package -n fish-completion-fwupd
+Summary:	Fish completion for fwupd commands
+Summary(pl.UTF-8):	Dopełnianie składni poleceń fwupd w fish
+Group:		Applications/Shells
+Requires:	%{name} = %{version}-%{release}
+Requires:	fish
+
+%description -n fish-completion-fwupd
+Fish completion for fwupd commands.
+
+%description -n fish-completion-fwupd -l pl.UTF-8
+Dopełnianie składni poleceń fwupd w fish.
 
 %package libs
 Summary:	Libraries for fwupd device firmware installing daemon
@@ -211,14 +228,14 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc AUTHORS MAINTAINERS README.md README-*.md
 %attr(755,root,root) %{_bindir}/dfu-tool
+%attr(755,root,root) %{_bindir}/fwupdagent
+%attr(755,root,root) %{_bindir}/fwupdate
 %attr(755,root,root) %{_bindir}/fwupdmgr
+%attr(755,root,root) %{_bindir}/fwupdtool
+%attr(755,root,root) %{_bindir}/fwupdtpmevlog
 %dir %{_libexecdir}/fwupd
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupd
-%attr(755,root,root) %{_libexecdir}/fwupd/fwupdagent
-%attr(755,root,root) %{_libexecdir}/fwupd/fwupdate
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupdoffline
-%attr(755,root,root) %{_libexecdir}/fwupd/fwupdtool
-%attr(755,root,root) %{_libexecdir}/fwupd/fwupdtpmevlog
 %dir %{_libexecdir}/fwupd/efi
 %{_libexecdir}/fwupd/efi/fwupd*.efi
 %dir %{_libdir}/fwupd-plugins-3
@@ -227,6 +244,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ata.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_colorhug.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_coreboot.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ccgx.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_cpu.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_csr.so
 %if %{with efi}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dell.so
@@ -236,11 +255,14 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dfu.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ebitdo.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_emmc.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ep963x.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_fastboot.so
 %if %{with flashrom}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_flashrom.so
 %endif
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_fresco_pd.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_jabra.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_logind.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_logitech_hidpp.so
 %if %{with modemmanager}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_modem_manager.so
@@ -276,15 +298,17 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_wacom_raw.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_wacom_usb.so
 %dir %{_sysconfdir}/fwupd
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/ata.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/thunderbolt.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/upower.conf
 %dir %{_sysconfdir}/fwupd/remotes.d
 %if %{with efi}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/dell-esrt.conf
 %endif
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/fwupd-tests.conf
+#%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/fwupd-tests.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs-testing.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/vendor.conf
@@ -344,6 +368,7 @@ rm -rf $RPM_BUILD_ROOT
 %lang(ru) %{_localedir}/ru/LC_IMAGES
 %lang(sr) %{_localedir}/sr/LC_IMAGES
 %lang(sv) %{_localedir}/sv/LC_IMAGES
+%lang(tr) %{_localedir}/tr/LC_IMAGES
 %lang(uk) %{_localedir}/uk/LC_IMAGES
 %lang(zh_CN) %{_localedir}/zh_CN/LC_IMAGES
 %lang(zh_TW) %{_localedir}/zh_TW/LC_IMAGES
@@ -351,13 +376,21 @@ rm -rf $RPM_BUILD_ROOT
 %dir /var/lib/fwupd/builder
 /var/lib/fwupd/builder/README.md
 %{_mandir}/man1/dfu-tool.1*
+%{_mandir}/man1/fwupdagent.1*
+%{_mandir}/man1/fwupdate.1*
 %{_mandir}/man1/fwupdmgr.1*
+%{_mandir}/man1/fwupdtool.1*
+%{_mandir}/man1/fwupdtpmevlog.1*
 
 %files -n bash-completion-fwupd
 %defattr(644,root,root,755)
 %{bash_compdir}/fwupdagent
 %{bash_compdir}/fwupdmgr
 %{bash_compdir}/fwupdtool
+
+%files -n fish-completion-fwupd
+%defattr(644,root,root,755)
+%{_datadir}/fish/vendor_completions.d/fwupdmgr.fish
 
 %files libs
 %defattr(644,root,root,755)
