@@ -12,14 +12,15 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.4.0
+Version:	1.4.4
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	53c57d2cde8179e25e91eaf82648d9aa
+# Source0-md5:	b506e291f5baedc49ce4ace6569fc952
 Patch0:		%{name}-bashcomp.patch
 Patch1:		%{name}-flashrom.patch
+Patch2:		%{name}-qmi.patch
 URL:		https://github.com/hughsie/fwupd
 %{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.10.0}
 %{?with_cairo:BuildRequires:	cairo-devel}
@@ -186,6 +187,7 @@ API języka Vala do biblioteki fwupd.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %ifarch x32
 # -m64 is needed to build x64 EFI
