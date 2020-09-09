@@ -227,6 +227,7 @@ rm -rf $RPM_BUILD_ROOT
 %files -f %{name}.lang
 %defattr(644,root,root,755)
 %doc AUTHORS MAINTAINERS README.md README-*.md
+%{?with_efi:%attr(755,root,root) %{_bindir}/dbxtool}
 %attr(755,root,root) %{_bindir}/dfu-tool
 %attr(755,root,root) %{_bindir}/fwupdagent
 %{?with_efi:%attr(755,root,root) %{_bindir}/fwupdate}
@@ -292,6 +293,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_tpm_eventlog.so
 %if %{with efi}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_uefi.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_uefi_dbx.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_uefi_recovery.so
 %endif
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_upower.so
@@ -380,6 +382,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /var/lib/fwupd
 %dir /var/lib/fwupd/builder
 /var/lib/fwupd/builder/README.md
+%{?with_efi:%{_mandir}/man1/dbxtool.1*}
 %{_mandir}/man1/dfu-tool.1*
 %{_mandir}/man1/fwupdagent.1*
 %{?with_efi:%{_mandir}/man1/fwupdate.1*}
