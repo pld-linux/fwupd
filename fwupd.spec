@@ -421,9 +421,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_pkgconfigdir}/fwupd.pc
 %{_pkgconfigdir}/fwupdplugin.pc
 
+%if %{with apidocs}
 %files apidocs
 %defattr(644,root,root,755)
 %{_gtkdocdir}/fwupd
+%endif
 
 %files -n vala-fwupd
 %defattr(644,root,root,755)
