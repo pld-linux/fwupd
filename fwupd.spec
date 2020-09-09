@@ -12,15 +12,14 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.4.4
+Version:	1.4.6
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	b506e291f5baedc49ce4ace6569fc952
+# Source0-md5:	2e5ae3c97c955cc0cb7d1c53323279e5
 Patch0:		%{name}-bashcomp.patch
 Patch1:		%{name}-flashrom.patch
-Patch2:		%{name}-qmi.patch
 URL:		https://github.com/hughsie/fwupd
 %{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.10.0}
 %{?with_cairo:BuildRequires:	cairo-devel}
@@ -187,7 +186,6 @@ API języka Vala do biblioteki fwupd.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 %ifarch x32
 # -m64 is needed to build x64 EFI
@@ -289,7 +287,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_thelio_io.so
 %if %{with thunderbolt}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_thunderbolt.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_thunderbolt_power.so
 %endif
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_tpm.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_tpm_eventlog.so
