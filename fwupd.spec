@@ -231,15 +231,17 @@ rm -rf $RPM_BUILD_ROOT
 %doc AUTHORS MAINTAINERS README.md README-*.md
 %attr(755,root,root) %{_bindir}/dfu-tool
 %attr(755,root,root) %{_bindir}/fwupdagent
-%attr(755,root,root) %{_bindir}/fwupdate
+%{?with_efi:%attr(755,root,root) %{_bindir}/fwupdate}
 %attr(755,root,root) %{_bindir}/fwupdmgr
 %attr(755,root,root) %{_bindir}/fwupdtool
 %attr(755,root,root) %{_bindir}/fwupdtpmevlog
 %dir %{_libexecdir}/fwupd
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupd
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupdoffline
+%if %{with efi}
 %dir %{_libexecdir}/fwupd/efi
 %{_libexecdir}/fwupd/efi/fwupd*.efi
+%endif
 %dir %{_libdir}/fwupd-plugins-3
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_altos.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_amt.so
@@ -302,10 +304,12 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/fwupd
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/ata.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/thunderbolt.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/upower.conf
+%if %{with efi}
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi.conf
+%endif
 %dir %{_sysconfdir}/fwupd/remotes.d
 %if %{with efi}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/dell-esrt.conf
@@ -352,6 +356,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/polkit-1/actions/org.freedesktop.fwupd.policy
 %{_datadir}/polkit-1/rules.d/org.freedesktop.fwupd.rules
 %{_iconsdir}/hicolor/scalable/apps/org.freedesktop.fwupd.svg
+%if %{with efi}
 %lang(ca) %{_localedir}/ca/LC_IMAGES
 %lang(cs) %{_localedir}/cs/LC_IMAGES
 %lang(da) %{_localedir}/da/LC_IMAGES
@@ -374,12 +379,13 @@ rm -rf $RPM_BUILD_ROOT
 %lang(uk) %{_localedir}/uk/LC_IMAGES
 %lang(zh_CN) %{_localedir}/zh_CN/LC_IMAGES
 %lang(zh_TW) %{_localedir}/zh_TW/LC_IMAGES
+%endif
 %dir /var/lib/fwupd
 %dir /var/lib/fwupd/builder
 /var/lib/fwupd/builder/README.md
 %{_mandir}/man1/dfu-tool.1*
 %{_mandir}/man1/fwupdagent.1*
-%{_mandir}/man1/fwupdate.1*
+%{?with_efi:%{_mandir}/man1/fwupdate.1*}
 %{_mandir}/man1/fwupdmgr.1*
 %{_mandir}/man1/fwupdtool.1*
 %{_mandir}/man1/fwupdtpmevlog.1*
