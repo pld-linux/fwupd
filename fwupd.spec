@@ -13,7 +13,7 @@ Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
 Version:	1.4.6
-Release:	1
+Release:	2
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
@@ -159,7 +159,7 @@ Pliki nagłówkowe bibliotek fwupd.
 Summary:	API documentation for fwupd libraries
 Summary(pl.UTF-8):	Dokumentacja API do bibliotek fwupd
 Group:		Documentation
-%if "%{_rpmversion}" >= "5"
+%if "%{_rpmversion}" >= "4.6"
 BuildArch:	noarch
 %endif
 
