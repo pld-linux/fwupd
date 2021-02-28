@@ -159,9 +159,7 @@ Pliki nagłówkowe bibliotek fwupd.
 Summary:	API documentation for fwupd libraries
 Summary(pl.UTF-8):	Dokumentacja API do bibliotek fwupd
 Group:		Documentation
-%if "%{_rpmversion}" >= "4.6"
 BuildArch:	noarch
-%endif
 
 %description apidocs
 API documentation for fwupd libraries.
