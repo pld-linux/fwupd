@@ -200,11 +200,6 @@ API języka Vala do biblioteki fwupd.
 %prep
 %setup -q
 
-%ifarch x32
-# -m64 is needed to build x64 EFI
-%{__sed} -i -e "/^if efi_arch == 'x86_64'/,/^elif/ s/'-mno-red-zone',/& '-m64',/" plugins/uefi/efi/meson.build
-%endif
-
 %build
 %meson build \
 	-Dbash_completiondir=%{bash_compdir} \
