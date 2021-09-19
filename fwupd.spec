@@ -12,12 +12,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.6.0
+Version:	1.6.3
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	0817e0fe6b52e328bb08575acd9a6251
+# Source0-md5:	550bf34c1cc8928c08e565c76252044d
 URL:		https://github.com/hughsie/fwupd
 %{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.10.0}
 BuildRequires:	bash-completion-devel >= 2.0
@@ -51,7 +51,8 @@ BuildRequires:	libgpg-error-devel
 BuildRequires:	libgudev-devel >= 232
 BuildRequires:	libgusb-devel >= 0.3.5
 BuildRequires:	libjcat-devel >= 0.1.0
-%{?with_modemmanager:BuildRequires:	libqmi-devel >= 1.22.0}
+%{?with_modemmanager:BuildRequires:	libmbim-devel >= 1.22.0}
+%{?with_modemmanager:BuildRequires:	libqmi-devel >= 1.23.1}
 # for dell (which requires also uefi plugin and efivar)
 %{?with_efi:BuildRequires:	libsmbios-devel >= 2.4.0}
 BuildRequires:	libsoup-devel >= 2.52
@@ -60,7 +61,7 @@ BuildRequires:	libxmlb-devel >= 0.1.13
 BuildRequires:	libxslt-progs
 # for <linux/nvme_ioctl.h>
 BuildRequires:	linux-libc-headers >= 7:4.4
-BuildRequires:	meson >= 0.47.0
+BuildRequires:	meson >= 0.50.0
 BuildRequires:	ninja >= 1.6
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.114
@@ -85,7 +86,8 @@ Requires:	gnutls-libs >= 3.6.0
 Requires:	libgudev >= 232
 Requires:	libgusb >= 0.3.5
 Requires:	libjcat >= 0.1.0
-%{?with_modemmanager:Requires:	libqmi >= 1.22.0}
+%{?with_modemmanager:Requires:	libmbim >= 1.22.0}
+%{?with_modemmanager:Requires:	libqmi >= 1.23.1}
 %{?with_efi:Requires:	libsmbios >= 2.4.0}
 Requires:	libsoup >= 2.52
 Requires:	libxmlb >= 0.1.7
@@ -203,13 +205,15 @@ API języka Vala do biblioteki fwupd.
 %build
 %meson build \
 	-Dbash_completiondir=%{bash_compdir} \
+	-Dbluez=true \
 	-Defi_binary=false \
-	-Dgtkdoc=%{__true_false apidocs} \
+	-Ddocs=%{?with_apidocs:gtkdoc}%{!?with_apidocs:none} \
 	-Dlzma=true \
 	%{!?with_efi:-Dplugin_dell=false} \
 	%{?with_flashrom:-Dplugin_flashrom=true} \
 	-Dplugin_intel_spi=true \
 	%{?with_modemmanager:-Dplugin_modem_manager=true} \
+	-Dplugin_platform_integrity=true \
 	%{!?with_efi:-Dplugin_redfish=false} \
 	%{!?with_thunderbolt:-Dplugin_thunderbolt=false} \
 	%{!?with_efi:-Dplugin_uefi_capsule=false} \
@@ -252,6 +256,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/fwupd-plugins-3
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_acpi_dmar.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_acpi_facp.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_acpi_phat.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_altos.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_analogix.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_amt.so
@@ -285,6 +290,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_intel_spi.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_iommu.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_jabra.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_lenovo_thinklmi.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_linux_lockdown.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_linux_sleep.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_linux_swap.so
@@ -298,9 +304,13 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nitrokey.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nvme.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_optionrom.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_parade_lspcon.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_pci_bcr.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_pci_mei.so
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_pixart_rf.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_platform_integrity.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_powerd.so
+%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_realtek_mst.so
 %if %{with efi}
 %attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_redfish.so
 %endif
@@ -333,7 +343,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/fwupd
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/thunderbolt.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/upower.conf
 %if %{with efi}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi_capsule.conf
@@ -342,13 +351,12 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with efi}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/dell-esrt.conf
 %endif
-#%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/fwupd-tests.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs-testing.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/vendor.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/vendor-directory.conf
+#/etc/grub.d/35_fwupd
 %dir %{_sysconfdir}/pki/fwupd
-#%{_sysconfdir}/pki/fwupd/GPG-KEY-Hughski-Limited
 %{_sysconfdir}/pki/fwupd/GPG-KEY-Linux-Foundation-Firmware
 %{_sysconfdir}/pki/fwupd/GPG-KEY-Linux-Vendor-Firmware-Service
 %{_sysconfdir}/pki/fwupd/LVFS-CA.pem
@@ -356,12 +364,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pki/fwupd-metadata/GPG-KEY-Linux-Foundation-Metadata
 %{_sysconfdir}/pki/fwupd-metadata/GPG-KEY-Linux-Vendor-Firmware-Service
 %{_sysconfdir}/pki/fwupd-metadata/LVFS-CA.pem
+#/lib/modules-load.d/fwupd-msr.conf
+#/lib/modules-load.d/fwupd-platform-integrity.conf
 %{systemdunitdir}/fwupd.service
 %{systemdunitdir}/fwupd-offline-update.service
 %{systemdunitdir}/fwupd-refresh.service
 %{systemdunitdir}/fwupd-refresh.timer
 %{systemdunitdir}/system-update.target.wants/fwupd-offline-update.service
-#/lib/modules-load.d/fwupd-msr.conf
 /lib/systemd/system-preset/fwupd-refresh.preset
 /lib/systemd/system-shutdown/fwupd.shutdown
 /lib/udev/rules.d/90-fwupd-devices.rules
@@ -388,9 +397,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/polkit-1/actions/org.freedesktop.fwupd.policy
 %{_datadir}/polkit-1/rules.d/org.freedesktop.fwupd.rules
 %{_iconsdir}/hicolor/scalable/apps/org.freedesktop.fwupd.svg
-%dir /var/lib/fwupd
-%dir /var/lib/fwupd/builder
-/var/lib/fwupd/builder/README.md
 %{?with_efi:%{_mandir}/man1/dbxtool.1*}
 %{_mandir}/man1/dfu-tool.1*
 %{_mandir}/man1/fwupdagent.1*
@@ -445,5 +451,3 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %{_datadir}/vala/vapi/fwupd.deps
 %{_datadir}/vala/vapi/fwupd.vapi
-%{_datadir}/vala/vapi/fwupdplugin.deps
-%{_datadir}/vala/vapi/fwupdplugin.vapi
