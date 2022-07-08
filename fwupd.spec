@@ -209,18 +209,18 @@ API języka Vala do biblioteki fwupd.
 
 %build
 %meson build \
-	-Dbluez=true \
+	-Dbluez=enabled \
 	-Defi_binary=false \
 	-Ddocs=%{?with_apidocs:gtkdoc}%{!?with_apidocs:none} \
-	-Dlzma=true \
-	%{!?with_efi:-Dplugin_dell=false} \
-	%{?with_flashrom:-Dplugin_flashrom=true} \
+	-Dlzma=enabled \
+	%{!?with_efi:-Dplugin_dell=disabled} \
+	%{?with_flashrom:-Dplugin_flashrom=enabled} \
 	-Dplugin_intel_spi=true \
-	%{?with_modemmanager:-Dplugin_modem_manager=true} \
+	%{?with_modemmanager:-Dplugin_modem_manager=enabled} \
 	-Dplugin_platform_integrity=true \
-	%{!?with_efi:-Dplugin_redfish=false} \
-	%{!?with_thunderbolt:-Dplugin_thunderbolt=false} \
-	%{!?with_efi:-Dplugin_uefi_capsule=false} \
+	%{!?with_efi:-Dplugin_redfish=disabled} \
+	%{!?with_thunderbolt:-Dplugin_thunderbolt=disabled} \
+	%{!?with_efi:-Dplugin_uefi_capsule=disabled} \
 	-Dtests=false
 
 %meson_build -C build
@@ -319,6 +319,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_parade_lspcon.so
 %attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_pci_bcr.so
 %attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_pci_mei.so
+%ifarch %{x8664} x32
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_pci_psp.so
+%endif
 %attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_pixart_rf.so
 %attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_platform_integrity.so
 %attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_powerd.so
