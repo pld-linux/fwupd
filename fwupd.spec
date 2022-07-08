@@ -12,12 +12,12 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.6.5
+Version:	1.8.1
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	7d38a547d8fdbf379998c572946b8be3
+# Source0-md5:	bf76925cb36c8da4c1c626cdabb53799
 URL:		https://github.com/hughsie/fwupd
 %{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.10.0}
 BuildRequires:	bash-completion-devel >= 2.0
@@ -42,15 +42,17 @@ BuildRequires:	glib2-devel >= 1:2.55.0
 BuildRequires:	gnutls-devel >= 3.6.0
 BuildRequires:	gobject-introspection-devel >= 0.9.8
 BuildRequires:	gpgme-devel
+# or gi-docgen >= 2021.1 with -Ddocs=docgen
 %{?with_doc:BuildRequires:	gtk-doc >= 1.14}
 BuildRequires:	intltool >= 0.35.0
 BuildRequires:	json-glib-devel >= 1.1.1
 BuildRequires:	libarchive-devel
+BuildRequires:	libcbor-devel >= 0.7.0
 %{?with_flashrom:BuildRequires:	libflashrom-devel >= 1.2}
 BuildRequires:	libgpg-error-devel
 BuildRequires:	libgudev-devel >= 232
 BuildRequires:	libgusb-devel >= 0.3.5
-BuildRequires:	libjcat-devel >= 0.1.0
+BuildRequires:	libjcat-devel >= 0.1.4
 %{?with_modemmanager:BuildRequires:	libmbim-devel >= 1.22.0}
 %{?with_modemmanager:BuildRequires:	libqmi-devel >= 1.23.1}
 # for dell (which requires also uefi plugin and efivar)
@@ -61,7 +63,7 @@ BuildRequires:	libxmlb-devel >= 0.1.13
 BuildRequires:	libxslt-progs
 # for <linux/nvme_ioctl.h>
 BuildRequires:	linux-libc-headers >= 7:4.4
-BuildRequires:	meson >= 0.50.0
+BuildRequires:	meson >= 0.60.0
 BuildRequires:	ninja >= 1.6
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.114
@@ -83,9 +85,10 @@ Requires:	%{name}-libs = %{version}-%{release}
 Requires:	curl-libs >= 7.62.0
 Requires:	gcab >= 1.0
 Requires:	gnutls-libs >= 3.6.0
+Requires:	libcbor >= 0.7.0
 Requires:	libgudev >= 232
 Requires:	libgusb >= 0.3.5
-Requires:	libjcat >= 0.1.0
+Requires:	libjcat >= 0.1.4
 %{?with_modemmanager:Requires:	libmbim >= 1.22.0}
 %{?with_modemmanager:Requires:	libqmi >= 1.23.1}
 %{?with_efi:Requires:	libsmbios >= 2.4.0}
@@ -97,6 +100,8 @@ Requires:	tpm2-tss >= 2.0
 Suggests:	fwupd-efi
 %endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		fwupd_plugins_dir	%{_libdir}/fwupd-plugins-6
 
 %description
 fwupd is a simple daemon to allow session software to update device
@@ -247,100 +252,111 @@ rm -rf $RPM_BUILD_ROOT
 %{?with_efi:%attr(755,root,root) %{_bindir}/fwupdate}
 %attr(755,root,root) %{_bindir}/fwupdmgr
 %attr(755,root,root) %{_bindir}/fwupdtool
-%attr(755,root,root) %{_bindir}/fwupdtpmevlog
 %dir %{_libexecdir}/fwupd
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupd
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupd-detect-cet
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupdoffline
-%dir %{_libdir}/fwupd-plugins-3
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_acpi_dmar.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_acpi_facp.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_acpi_phat.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_altos.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_analogix.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_amt.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ata.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_bcm57xx.so
+%dir %{fwupd_plugins_dir}
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_acpi_dmar.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_acpi_facp.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_acpi_ivrs.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_acpi_phat.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_analogix.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_amt.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_ata.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_bcm57xx.so
 %if %{with efi}
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_bios.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_bios.so
 %endif
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ccgx.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_colorhug.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_cpu.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_cros_ec.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_ccgx.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_cfu.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_ch341a.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_colorhug.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_corsair.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_cpu.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_cros_ec.so
 %if %{with efi}
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dell.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dell_esrt.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_dell.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_dell_esrt.so
 %endif
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dell_dock.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dfu.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_dfu_csr.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ebitdo.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_elantp.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_emmc.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_ep963x.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_fastboot.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_dell_dock.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_dfu.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_dfu_csr.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_ebitdo.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_elanfp.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_elantp.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_emmc.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_ep963x.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_fastboot.so
 %if %{with flashrom}
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_flashrom.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_flashrom.so
 %endif
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_fresco_pd.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_goodixmoc.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_hailuck.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_intel_spi.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_iommu.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_jabra.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_lenovo_thinklmi.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_linux_lockdown.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_linux_sleep.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_linux_swap.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_linux_tainted.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_logind.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_logitech_hidpp.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_fresco_pd.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_genesys.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_goodixmoc.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_gpio.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_hailuck.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_intel_spi.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_iommu.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_jabra.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_lenovo_thinklmi.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_linux_lockdown.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_linux_sleep.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_linux_swap.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_linux_tainted.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_logind.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_logitech_bulkcontroller.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_logitech_hidpp.so
 %if %{with modemmanager}
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_modem_manager.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_modem_manager.so
 %endif
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_msr.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nitrokey.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_nvme.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_optionrom.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_parade_lspcon.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_pci_bcr.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_pci_mei.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_pixart_rf.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_platform_integrity.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_powerd.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_realtek_mst.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_msr.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_mtd.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_nitrokey.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_nordic_hid.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_nvme.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_optionrom.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_parade_lspcon.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_pci_bcr.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_pci_mei.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_pixart_rf.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_platform_integrity.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_powerd.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_realtek_mst.so
 %if %{with efi}
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_redfish.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_redfish.so
 %endif
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_rts54hid.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_rts54hub.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_solokey.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_steelseries.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_superio.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synaptics_cxaudio.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synaptics_mst.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synaptics_prometheus.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_synaptics_rmi.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_system76_launch.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_thelio_io.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_rts54hid.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_rts54hub.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_scsi.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_steelseries.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_superio.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_synaptics_cape.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_synaptics_cxaudio.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_synaptics_mst.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_synaptics_prometheus.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_synaptics_rmi.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_system76_launch.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_thelio_io.so
 %if %{with thunderbolt}
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_thunderbolt.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_thunderbolt.so
 %endif
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_tpm.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_tpm_eventlog.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_tpm.so
 %if %{with efi}
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_uefi_capsule.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_uefi_dbx.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_uefi_pk.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_uefi_recovery.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_uefi_capsule.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_uefi_dbx.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_uefi_pk.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_uefi_recovery.so
 %endif
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_upower.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_vli.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_wacom_raw.so
-%attr(755,root,root) %{_libdir}/fwupd-plugins-3/libfu_plugin_wacom_usb.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_uf2.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_upower.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_usi_dock.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_vli.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_wacom_raw.so
+%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_wacom_usb.so
 %dir %{_sysconfdir}/fwupd
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/msr.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/thunderbolt.conf
 %if %{with efi}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
@@ -365,6 +381,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pki/fwupd-metadata/LVFS-CA.pem
 #/lib/modules-load.d/fwupd-msr.conf
 #/lib/modules-load.d/fwupd-platform-integrity.conf
+#/lib/modules-load.d/fwupd-redfish.conf
 %{systemdunitdir}/fwupd.service
 %{systemdunitdir}/fwupd-offline-update.service
 %{systemdunitdir}/fwupd-refresh.service
@@ -402,7 +419,6 @@ rm -rf $RPM_BUILD_ROOT
 %{?with_efi:%{_mandir}/man1/fwupdate.1*}
 %{_mandir}/man1/fwupdmgr.1*
 %{_mandir}/man1/fwupdtool.1*
-%{_mandir}/man1/fwupdtpmevlog.1*
 
 %files -n bash-completion-fwupd
 %defattr(644,root,root,755)
@@ -419,7 +435,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/libfwupd.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libfwupd.so.2
 %attr(755,root,root) %{_libdir}/libfwupdplugin.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libfwupdplugin.so.2
+%attr(755,root,root) %ghost %{_libdir}/libfwupdplugin.so.6
 %{_libdir}/girepository-1.0/Fwupd-2.0.typelib
 %{_libdir}/girepository-1.0/FwupdPlugin-1.0.typelib
 
