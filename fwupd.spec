@@ -83,7 +83,6 @@ BuildRequires:	xz-devel
 %if %{with efi}
 # any Sans font
 BuildRequires:	fonts-TTF-DejaVu
-BuildRequires:	gobject-introspection-devel
 BuildRequires:	pango >= 1:1.26.0
 BuildRequires:	python3-pycairo
 BuildRequires:	python3-pygobject3
