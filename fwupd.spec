@@ -1,6 +1,7 @@
 #
 # Conditional build:
 %bcond_without	apidocs
+%bcond_without	dell		# Dell-specific support
 %bcond_without	efi		# UEFI (and dell, redfish) support
 %bcond_without	flashrom	# flashrom plugin
 %bcond_without	modemmanager	# modem_manager plugin
@@ -8,6 +9,13 @@
 
 %ifnarch %{ix86} %{x8664} x32 %{arm} aarch64
 %undefine	with_efi
+%endif
+# libsmbios archs
+%ifnarch	%{ix86} %{x8664} x32
+%undefine	with_dell
+%endif
+%if %{without efi}
+%undefine	with_dell
 %endif
 %ifarch %{ix86} %{x8664} x32
 %define		with_intel_spi	1
@@ -49,7 +57,7 @@ BuildRequires:	libjcat-devel >= 0.1.4
 %{?with_modemmanager:BuildRequires:	libmbim-devel >= 1.22.0}
 %{?with_modemmanager:BuildRequires:	libqmi-devel >= 1.23.1}
 # for dell (which requires also uefi plugin and efivar)
-%{?with_efi:BuildRequires:	libsmbios-devel >= 2.4.0}
+%{?with_dell:BuildRequires:	libsmbios-devel >= 2.4.0}
 BuildRequires:	libsoup-devel >= 2.52
 BuildRequires:	libuuid-devel
 BuildRequires:	libxmlb-devel >= 0.1.15
@@ -84,7 +92,7 @@ Requires:	libgusb >= 0.3.5
 Requires:	libjcat >= 0.1.4
 %{?with_modemmanager:Requires:	libmbim >= 1.22.0}
 %{?with_modemmanager:Requires:	libqmi >= 1.23.1}
-%{?with_efi:Requires:	libsmbios >= 2.4.0}
+%{?with_dell:Requires:	libsmbios >= 2.4.0}
 Requires:	libsoup >= 2.52
 Requires:	libxmlb >= 0.1.15
 Requires:	polkit >= 0.114
@@ -208,7 +216,7 @@ API języka Vala do biblioteki fwupd.
 	-Defi_binary=false \
 	-Ddocs=%{__enabled_disabled apidocs} \
 	-Dlzma=enabled \
-	%{!?with_efi:-Dplugin_dell=disabled} \
+	%{!?with_dell:-Dplugin_dell=disabled} \
 	%{!?with_flashrom:-Dplugin_flashrom=disabled} \
 	%{?with_intel_spi:-Dplugin_intel_spi=true} \
 	%{!?with_modemmanager:-Dplugin_modem_manager=disabled} \
@@ -271,7 +279,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi_capsule.conf
 %endif
 %dir %{_sysconfdir}/fwupd/remotes.d
-%if %{with efi}
+%if %{with dell}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/dell-esrt.conf
 %endif
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs.conf
@@ -308,7 +316,7 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 %{_datadir}/fwupd/quirks.d
 %dir %{_datadir}/fwupd/remotes.d
-%if %{with efi}
+%if %{with dell}
 %{_datadir}/fwupd/remotes.d/dell-esrt
 %endif
 %{_datadir}/fwupd/remotes.d/vendor
