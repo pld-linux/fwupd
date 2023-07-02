@@ -20,7 +20,7 @@ Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.t
 # Source0-md5:	bf6b6486f79732656980ba17a2087362
 URL:		https://github.com/hughsie/fwupd
 %{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.10.0}
-BuildRequires:	bash-completion-devel >= 2.0
+BuildRequires:	bash-completion-devel >= 1:2.0
 %{?with_cairo:BuildRequires:	cairo-devel}
 BuildRequires:	curl-devel >= 7.62.0
 %{?with_efi:BuildRequires:	efivar-devel >= 33}
@@ -110,7 +110,7 @@ Summary:	Bash completion for fwupd commands
 Summary(pl.UTF-8):	Bashowe dopełnianie składni poleceń fwupd
 Group:		Applications/Shells
 Requires:	%{name} = %{version}-%{release}
-Requires:	bash-completion >= 2.0
+Requires:	bash-completion >= 1:2.0
 
 %description -n bash-completion-fwupd
 Bash completion for fwupd commands.
