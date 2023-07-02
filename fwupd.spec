@@ -9,6 +9,9 @@
 %ifnarch %{ix86} %{x8664} x32 %{arm} aarch64
 %undefine	with_efi
 %endif
+%ifarch %{ix86} %{x8664} x32
+%define		with_intel_spi	1
+%endif
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
@@ -207,7 +210,7 @@ API języka Vala do biblioteki fwupd.
 	-Dlzma=enabled \
 	%{!?with_efi:-Dplugin_dell=disabled} \
 	%{!?with_flashrom:-Dplugin_flashrom=disabled} \
-	-Dplugin_intel_spi=true \
+	%{?with_intel_spi:-Dplugin_intel_spi=true} \
 	%{!?with_modemmanager:-Dplugin_modem_manager=disabled} \
 	%{!?with_efi:-Dplugin_redfish=disabled} \
 	%{!?with_efi:-Dplugin_uefi_capsule=disabled} \
