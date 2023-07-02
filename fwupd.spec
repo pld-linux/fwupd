@@ -269,7 +269,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/fwupdtool
 %dir %{_libexecdir}/fwupd
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupd
+%ifarch %{ix86} %{x8664} x32
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupd-detect-cet
+%endif
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupdoffline
 %if %{with flashrom}
 %attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_flashrom.so
@@ -279,8 +281,10 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 %dir %{_sysconfdir}/fwupd
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
+%ifarch %{ix86} %{x8664} x32
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/msr.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/thunderbolt.conf
+%endif
 %if %{with efi}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi_capsule.conf
