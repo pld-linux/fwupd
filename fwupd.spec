@@ -68,7 +68,6 @@ BuildRequires:	ninja >= 1.6
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.114
 BuildRequires:	python3 >= 1:3.0
-BuildRequires:	python3-pillow
 BuildRequires:	python3-pycairo
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 1.736
