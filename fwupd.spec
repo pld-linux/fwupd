@@ -111,6 +111,7 @@ Summary(pl.UTF-8):	Bashowe dopełnianie składni poleceń fwupd
 Group:		Applications/Shells
 Requires:	%{name} = %{version}-%{release}
 Requires:	bash-completion >= 1:2.0
+BuildArch:	noarch
 
 %description -n bash-completion-fwupd
 Bash completion for fwupd commands.
@@ -124,6 +125,7 @@ Summary(pl.UTF-8):	Dopełnianie składni poleceń fwupd w fish
 Group:		Applications/Shells
 Requires:	%{name} = %{version}-%{release}
 Requires:	fish
+BuildArch:	noarch
 
 %description -n fish-completion-fwupd
 Fish completion for fwupd commands.
