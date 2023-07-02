@@ -201,7 +201,7 @@ API języka Vala do biblioteki fwupd.
 %meson build \
 	-Dbluez=enabled \
 	-Defi_binary=false \
-	-Ddocs=%{?with_apidocs:enabled} \
+	-Ddocs=%{__enabled_disabled apidocs} \
 	-Dlzma=enabled \
 	%{!?with_efi:-Dplugin_dell=disabled} \
 	%{!?with_flashrom:-Dplugin_flashrom=disabled} \
