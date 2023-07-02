@@ -212,12 +212,12 @@ API języka Vala do biblioteki fwupd.
 	%{!?with_efi:-Dplugin_uefi_pk=disabled} \
 	-Dtests=false
 
-%meson_build -C build
+%ninja_build -C build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%meson_install -C build
+%ninja_install -C build
 
 for pdoc in plugins/*/README.md ; do
 	pname=$(basename $(dirname $pdoc))
