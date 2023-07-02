@@ -68,7 +68,6 @@ BuildRequires:	ninja >= 1.6
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.114
 BuildRequires:	python3 >= 1:3.0
-BuildRequires:	python3-pycairo
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 1.736
 BuildRequires:	sqlite3-devel >= 3
@@ -80,6 +79,15 @@ BuildRequires:	udev-devel
 %{?with_thunderbolt:BuildRequires:	umockdev-devel}
 BuildRequires:	xz
 BuildRequires:	xz-devel
+# efi capsule splash (po/test-deps)
+%if %{with efi}
+# any Sans font
+BuildRequires:	fonts-TTF-DejaVu
+BuildRequires:	gobject-introspection-devel
+BuildRequires:	pango >= 1:1.26.0
+BuildRequires:	python3-pycairo
+BuildRequires:	python3-pygobject3
+%endif
 Requires:	%{name}-libs = %{version}-%{release}
 %{?with_modemmanager:BuildRequires:	ModemManager-libs >= 1.10.0}
 Requires:	curl-libs >= 7.62.0
