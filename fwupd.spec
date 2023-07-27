@@ -23,12 +23,13 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.8.10
+Version:	1.8.17
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
-Source0:	https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
-# Source0-md5:	bf6b6486f79732656980ba17a2087362
+#Source0Download: https://github.com/hughsie/fwupd/releases
+Source0:	https://github.com/hughsie/fwupd/releases/download/%{version}/%{name}-%{version}.tar.xz
+# Source0-md5:	12b5ee390019a9fbfec2733597f53ced
 URL:		https://github.com/hughsie/fwupd
 %{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.10.0}
 BuildRequires:	bash-completion-devel >= 1:2.0
@@ -68,6 +69,7 @@ BuildRequires:	ninja >= 1.6
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.114
 BuildRequires:	python3 >= 1:3.0
+%{?with_doc:BuildRequires:	python3-markdown >= 3.2}
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 1.736
 BuildRequires:	sqlite3-devel >= 3
@@ -219,6 +221,7 @@ API języka Vala do biblioteki fwupd.
 %build
 %meson build \
 	-Dbluez=enabled \
+	-Dcompat_cli=true \
 	-Defi_binary=false \
 	-Ddocs=%{__enabled_disabled apidocs} \
 	-Dlzma=enabled \
@@ -259,7 +262,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -f %{name}.lang
 %defattr(644,root,root,755)
-%doc AUTHORS MAINTAINERS README.md README-*.md SECURITY.md
+%doc MAINTAINERS README.md README-*.md SECURITY.md
 %{?with_efi:%attr(755,root,root) %{_bindir}/dbxtool}
 %attr(755,root,root) %{_bindir}/dfu-tool
 %attr(755,root,root) %{_bindir}/fwupdagent
@@ -288,6 +291,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi_capsule.conf
 %endif
+%dir %{_sysconfdir}/fwupd/bios-settings.d
 %dir %{_sysconfdir}/fwupd/remotes.d
 %if %{with dell}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/dell-esrt.conf
@@ -346,7 +350,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n bash-completion-fwupd
 %defattr(644,root,root,755)
-%{bash_compdir}/fwupdagent
 %{bash_compdir}/fwupdmgr
 %{bash_compdir}/fwupdtool
 
