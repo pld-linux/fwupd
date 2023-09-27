@@ -71,7 +71,7 @@ BuildRequires:	polkit-devel >= 0.114
 BuildRequires:	python3 >= 1:3.0
 %{?with_doc:BuildRequires:	python3-markdown >= 3.2}
 BuildRequires:	rpm-build >= 4.6
-BuildRequires:	rpmbuild(macros) >= 1.736
+BuildRequires:	rpmbuild(macros) >= 2.029
 BuildRequires:	sqlite3-devel >= 3
 BuildRequires:	systemd-devel >= 1:209
 BuildRequires:	systemd-units >= 1:211
@@ -247,9 +247,8 @@ for pdoc in plugins/*/README.md ; do
 done
 
 %if %{with apidocs}
-# FIXME: where to package gi-docgen generated docs?
-install -d $RPM_BUILD_ROOT%{_gtkdocdir}
-%{__mv} $RPM_BUILD_ROOT%{_docdir}/*fwupd* $RPM_BUILD_ROOT%{_gtkdocdir}
+install -d $RPM_BUILD_ROOT%{_gidocdir}
+%{__mv} $RPM_BUILD_ROOT%{_docdir}/*fwupd* $RPM_BUILD_ROOT%{_gidocdir}
 %endif
 
 %find_lang %{name}
@@ -386,9 +385,9 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with apidocs}
 %files apidocs
 %defattr(644,root,root,755)
-%{_gtkdocdir}/fwupd
-%{_gtkdocdir}/libfwupd
-%{_gtkdocdir}/libfwupdplugin
+%{_gidocdir}/fwupd
+%{_gidocdir}/libfwupd
+%{_gidocdir}/libfwupdplugin
 %endif
 
 %files -n vala-fwupd
