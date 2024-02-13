@@ -79,6 +79,7 @@ BuildRequires:	tar >= 1:1.22
 BuildRequires:	tpm2-tss-devel >= 2.0
 BuildRequires:	udev-devel
 %{?with_thunderbolt:BuildRequires:	umockdev-devel}
+BuildRequires:	vala
 BuildRequires:	xz
 BuildRequires:	xz-devel
 # efi capsule splash (po/test-deps)
