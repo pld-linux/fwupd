@@ -23,14 +23,14 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.8.17
-Release:	2
+Version:	1.9.21
+Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
-#Source0Download: https://github.com/hughsie/fwupd/releases
-Source0:	https://github.com/hughsie/fwupd/releases/download/%{version}/%{name}-%{version}.tar.xz
-# Source0-md5:	12b5ee390019a9fbfec2733597f53ced
-URL:		https://github.com/hughsie/fwupd
+#Source0Download: https://github.com/fwupd/fwupd/releases
+Source0:	https://github.com/fwupd/fwupd/releases/download/%{version}/%{name}-%{version}.tar.xz
+# Source0-md5:	df16458722536465787d02991d5d82e9
+URL:		https://github.com/fwupd/fwupd
 %{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.10.0}
 BuildRequires:	bash-completion-devel >= 1:2.0
 %{?with_cairo:BuildRequires:	cairo-devel}
@@ -44,10 +44,10 @@ BuildRequires:	gcc >= 6:4.7
 BuildRequires:	gcc-multilib-64 >= 6:4.7
 %endif
 BuildRequires:	gettext-tools >= 0.19.7
+%{?with_doc:BuildRequires:	gi-docgen >= 2022.2}
 BuildRequires:	glib2-devel >= 1:2.55.0
 BuildRequires:	gnutls-devel >= 3.6.0
 BuildRequires:	gobject-introspection-devel >= 0.9.8
-%{?with_doc:BuildRequires:	gi-docgen >= 2022.2}
 BuildRequires:	json-glib-devel >= 1.1.1
 BuildRequires:	libarchive-devel
 BuildRequires:	libcbor-devel >= 0.7.0
@@ -90,8 +90,8 @@ BuildRequires:	pango >= 1:1.26.0
 BuildRequires:	python3-pycairo
 BuildRequires:	python3-pygobject3
 %endif
-Requires:	%{name}-libs = %{version}-%{release}
 %{?with_modemmanager:BuildRequires:	ModemManager-libs >= 1.10.0}
+Requires:	%{name}-libs = %{version}-%{release}
 Requires:	curl-libs >= 7.62.0
 Requires:	gcab >= 1.0
 Requires:	gnutls-libs >= 3.6.0
@@ -282,25 +282,28 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_modem_manager.so
 %endif
 %dir %{_sysconfdir}/fwupd
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
+#%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
 %ifarch %{ix86} %{x8664} x32
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/msr.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/thunderbolt.conf
+#%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/msr.conf
+#%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/thunderbolt.conf
 %endif
 %if %{with efi}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi_capsule.conf
+#%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
+#%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi_capsule.conf
 %endif
 %dir %{_sysconfdir}/fwupd/bios-settings.d
+%{_sysconfdir}/fwupd/bios-settings.d/README.md
+%config(noreplace) %verify(not md5 mtime size)%{_sysconfdir}/fwupd/fwupd.conf
+
 %dir %{_sysconfdir}/fwupd/remotes.d
 %if %{with dell}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/dell-esrt.conf
+#%config(noreplace missingok) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/dell-esrt.conf
 %endif
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs-testing.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/vendor.conf
+#%config(noreplace missingok) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/vendor.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/vendor-directory.conf
-#/etc/grub.d/35_fwupd
+#%{_sysconfdir}/grub.d/35_fwupd
 %dir %{_sysconfdir}/pki/fwupd
 %{_sysconfdir}/pki/fwupd/GPG-KEY-Linux-Foundation-Firmware
 %{_sysconfdir}/pki/fwupd/GPG-KEY-Linux-Vendor-Firmware-Service
@@ -315,9 +318,10 @@ rm -rf $RPM_BUILD_ROOT
 %{systemdunitdir}/fwupd-refresh.service
 %{systemdunitdir}/fwupd-refresh.timer
 %{systemdunitdir}/system-update.target.wants/fwupd-offline-update.service
-/lib/systemd/system-preset/fwupd-refresh.preset
-/lib/systemd/system-shutdown/fwupd.shutdown
+#%{systemdunitdir}-preset/fwupd-refresh.preset
+%{systemdunitdir}-shutdown/fwupd.shutdown
 /lib/udev/rules.d/90-fwupd-devices.rules
+%{_prefix}/lib/sysusers.d/fwupd.conf
 %{_datadir}/dbus-1/system.d/org.freedesktop.fwupd.conf
 %{_datadir}/dbus-1/system-services/org.freedesktop.fwupd.service
 %dir %{_datadir}/fwupd
@@ -331,7 +335,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/fwupd/quirks.d
 %dir %{_datadir}/fwupd/remotes.d
 %if %{with dell}
-%{_datadir}/fwupd/remotes.d/dell-esrt
+#%{_datadir}/fwupd/remotes.d/dell-esrt
 %endif
 %{_datadir}/fwupd/remotes.d/vendor
 %{_datadir}/metainfo/org.freedesktop.fwupd.metainfo.xml
@@ -347,6 +351,9 @@ rm -rf $RPM_BUILD_ROOT
 %{?with_efi:%{_mandir}/man1/fwupdate.1*}
 %{_mandir}/man1/fwupdmgr.1*
 %{_mandir}/man1/fwupdtool.1*
+%{_mandir}/man5/fwupd-remotes.d.5*
+%{_mandir}/man5/fwupd.conf.5*
+%{_mandir}/man8/fwupd-refresh.service.8*
 
 %files -n bash-completion-fwupd
 %defattr(644,root,root,755)
@@ -355,7 +362,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n fish-completion-fwupd
 %defattr(644,root,root,755)
-%{_datadir}/fish/vendor_completions.d/fwupdmgr.fish
+%{fish_compdir}/fwupdmgr.fish
 
 %files libs
 %defattr(644,root,root,755)
