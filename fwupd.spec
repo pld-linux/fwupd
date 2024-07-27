@@ -44,7 +44,7 @@ BuildRequires:	gcc >= 6:4.7
 BuildRequires:	gcc-multilib-64 >= 6:4.7
 %endif
 BuildRequires:	gettext-tools >= 0.19.7
-%{?with_doc:BuildRequires:	gi-docgen >= 2022.2}
+%{?with_apidocs:BuildRequires:	gi-docgen >= 2022.2}
 BuildRequires:	glib2-devel >= 1:2.55.0
 BuildRequires:	gnutls-devel >= 3.6.0
 BuildRequires:	gobject-introspection-devel >= 0.9.8
@@ -69,7 +69,7 @@ BuildRequires:	ninja >= 1.6
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.114
 BuildRequires:	python3 >= 1:3.0
-%{?with_doc:BuildRequires:	python3-markdown >= 3.2}
+%{?with_apidocs:BuildRequires:	python3-markdown >= 3.2}
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 2.029
 BuildRequires:	sqlite3-devel >= 3
@@ -271,7 +271,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/fwupdtool
 %dir %{_libexecdir}/fwupd
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupd
-%ifarch %{ix86} %{x8664} x32
+%ifarch %{x8664} x32
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupd-detect-cet
 %endif
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupdoffline
