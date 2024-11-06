@@ -36,8 +36,6 @@ BuildRequires:	bash-completion-devel >= 1:2.0
 %{?with_cairo:BuildRequires:	cairo-devel}
 BuildRequires:	curl-devel >= 7.62.0
 %{?with_efi:BuildRequires:	efivar-devel >= 33}
-# pkgconfig(libelf); can be also libelf-devel
-BuildRequires:	gcab-devel >= 1.0
 # C11
 BuildRequires:	gcc >= 6:4.7
 %ifarch x32
@@ -45,35 +43,37 @@ BuildRequires:	gcc-multilib-64 >= 6:4.7
 %endif
 BuildRequires:	gettext-tools >= 0.19.7
 %{?with_apidocs:BuildRequires:	gi-docgen >= 2022.2}
-BuildRequires:	glib2-devel >= 1:2.55.0
+BuildRequires:	glib2-devel >= 1:2.68.0
 BuildRequires:	gnutls-devel >= 3.6.0
 BuildRequires:	gobject-introspection-devel >= 0.9.8
-BuildRequires:	json-glib-devel >= 1.1.1
+BuildRequires:	json-glib-devel >= 1.6.0
 BuildRequires:	libarchive-devel
 BuildRequires:	libcbor-devel >= 0.7.0
+BuildRequires:	libdrm-devel >= 2.4.113
 %{?with_flashrom:BuildRequires:	libflashrom-devel >= 1.2}
 BuildRequires:	libgudev-devel >= 232
-BuildRequires:	libgusb-devel >= 0.3.5
+BuildRequires:	libgusb-devel >= 0.3.8
 BuildRequires:	libjcat-devel >= 0.1.4
 %{?with_modemmanager:BuildRequires:	libmbim-devel >= 1.22.0}
 %{?with_modemmanager:BuildRequires:	libqmi-devel >= 1.23.1}
 # for dell (which requires also uefi plugin and efivar)
 %{?with_dell:BuildRequires:	libsmbios-devel >= 2.4.0}
-BuildRequires:	libsoup-devel >= 2.52
 BuildRequires:	libuuid-devel
-BuildRequires:	libxmlb-devel >= 0.1.15
+BuildRequires:	libxmlb-devel >= 0.3.18
 # for <linux/nvme_ioctl.h>
 BuildRequires:	linux-libc-headers >= 7:4.4
-BuildRequires:	meson >= 0.61.0
+BuildRequires:	meson >= 0.62.0
 BuildRequires:	ninja >= 1.6
+BuildRequires:	passim-devel >= 0.1.2
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.114
+BuildRequires:	protobuf-c-devel
 BuildRequires:	python3 >= 1:3.0
 %{?with_apidocs:BuildRequires:	python3-markdown >= 3.2}
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 2.029
 BuildRequires:	sqlite3-devel >= 3
-BuildRequires:	systemd-devel >= 1:209
+BuildRequires:	systemd-devel >= 1:211
 BuildRequires:	systemd-units >= 1:211
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	tpm2-tss-devel >= 2.0
@@ -82,6 +82,7 @@ BuildRequires:	udev-devel
 BuildRequires:	vala
 BuildRequires:	xz
 BuildRequires:	xz-devel
+BuildRequires:	zlib-devel
 # efi capsule splash (po/test-deps)
 %if %{with efi}
 # any Sans font
@@ -92,18 +93,9 @@ BuildRequires:	python3-pygobject3
 %endif
 %{?with_modemmanager:BuildRequires:	ModemManager-libs >= 1.10.0}
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	curl-libs >= 7.62.0
-Requires:	gcab >= 1.0
-Requires:	gnutls-libs >= 3.6.0
-Requires:	libcbor >= 0.7.0
-Requires:	libgudev >= 232
-Requires:	libgusb >= 0.3.5
-Requires:	libjcat >= 0.1.4
 %{?with_modemmanager:Requires:	libmbim >= 1.22.0}
 %{?with_modemmanager:Requires:	libqmi >= 1.23.1}
 %{?with_dell:Requires:	libsmbios >= 2.4.0}
-Requires:	libsoup >= 2.52
-Requires:	libxmlb >= 0.1.15
 Requires:	polkit >= 0.114
 Requires:	tpm2-tss >= 2.0
 %if %{with efi}
@@ -157,8 +149,17 @@ Dopełnianie składni poleceń fwupd w fish.
 Summary:	Libraries for fwupd device firmware installing daemon
 Summary(pl.UTF-8):	Biblioteki dla demona fwupd instalującego aktualizacje firmware'u
 Group:		Libraries
-Requires:	glib2-devel >= 1:2.55.0
-Requires:	json-glib >= 1.1.1
+Requires:	curl-libs >= 7.62.0
+Requires:	glib2-devel >= 1:2.68.0
+Requires:	gnutls-libs >= 3.6.0
+Requires:	json-glib >= 1.6.0
+Requires:	libcbor >= 0.7.0
+Requires:	libgudev >= 232
+Requires:	libgusb >= 0.3.8
+Requires:	libjcat >= 0.1.4
+Requires:	libxmlb >= 0.3.18
+Requires:	passim-libs >= 0.1.2
+Requires:	polkit-libs >= 0.114
 
 %description libs
 Libraries for fwupd device firmware installing daemon.
@@ -171,7 +172,10 @@ Summary:	Header files for fwupd libraries
 Summary(pl.UTF-8):	Pliki nagłówkowe bibliotek fwupd
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	glib2-devel >= 1:2.55.0
+Requires:	curl-devel >= 7.62.0
+Requires:	glib2-devel >= 1:2.68.0
+Requires:	json-glib-devel >= 1.6.0
+Requires:	libjcat-devel >= 0.1.4
 
 %description devel
 Header files for fwupd libraries.
@@ -208,7 +212,6 @@ Summary:	Vala API for fwupd library
 Summary(pl.UTF-8):	API języka Vala do biblioteki fwupd
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
-Requires:	vala-libsoup >= 2.52
 
 %description -n vala-fwupd
 Vala API for fwupd library.
@@ -282,25 +285,13 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_modem_manager.so
 %endif
 %dir %{_sysconfdir}/fwupd
-#%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/daemon.conf
-%ifarch %{ix86} %{x8664} x32
-#%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/msr.conf
-#%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/thunderbolt.conf
-%endif
-%if %{with efi}
-#%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/redfish.conf
-#%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/uefi_capsule.conf
-%endif
 %dir %{_sysconfdir}/fwupd/bios-settings.d
 %{_sysconfdir}/fwupd/bios-settings.d/README.md
 %config(noreplace) %verify(not md5 mtime size)%{_sysconfdir}/fwupd/fwupd.conf
-
 %dir %{_sysconfdir}/fwupd/remotes.d
-%if %{with dell}
-#%config(noreplace missingok) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/dell-esrt.conf
-%endif
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/lvfs-testing.conf
+# used with -Dvendor_metadata=true (see data/remotes.d/README.md)
 #%config(noreplace missingok) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/vendor.conf
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/fwupd/remotes.d/vendor-directory.conf
 #%{_sysconfdir}/grub.d/35_fwupd
@@ -318,8 +309,7 @@ rm -rf $RPM_BUILD_ROOT
 %{systemdunitdir}/fwupd-refresh.service
 %{systemdunitdir}/fwupd-refresh.timer
 %{systemdunitdir}/system-update.target.wants/fwupd-offline-update.service
-#%{systemdunitdir}-preset/fwupd-refresh.preset
-%{systemdunitdir}-shutdown/fwupd.shutdown
+%attr(754,root,root) /lib/systemd/system-shutdown/fwupd.shutdown
 /lib/udev/rules.d/90-fwupd-devices.rules
 %{_prefix}/lib/sysusers.d/fwupd.conf
 %{_datadir}/dbus-1/system.d/org.freedesktop.fwupd.conf
@@ -334,9 +324,6 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 %{_datadir}/fwupd/quirks.d
 %dir %{_datadir}/fwupd/remotes.d
-%if %{with dell}
-#%{_datadir}/fwupd/remotes.d/dell-esrt
-%endif
 %{_datadir}/fwupd/remotes.d/vendor
 %{_datadir}/metainfo/org.freedesktop.fwupd.metainfo.xml
 %dir %{_datadir}/fwupd/metainfo
