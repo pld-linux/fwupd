@@ -23,13 +23,13 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.9.21
+Version:	1.9.26
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 #Source0Download: https://github.com/fwupd/fwupd/releases
 Source0:	https://github.com/fwupd/fwupd/releases/download/%{version}/%{name}-%{version}.tar.xz
-# Source0-md5:	df16458722536465787d02991d5d82e9
+# Source0-md5:	a8431166caaad9a8c0449d3643ad494b
 URL:		https://github.com/fwupd/fwupd
 %{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.10.0}
 BuildRequires:	bash-completion-devel >= 1:2.0
@@ -53,7 +53,7 @@ BuildRequires:	libdrm-devel >= 2.4.113
 %{?with_flashrom:BuildRequires:	libflashrom-devel >= 1.2}
 BuildRequires:	libgudev-devel >= 232
 BuildRequires:	libgusb-devel >= 0.3.8
-BuildRequires:	libjcat-devel >= 0.1.4
+BuildRequires:	libjcat-devel >= 0.2.0
 %{?with_modemmanager:BuildRequires:	libmbim-devel >= 1.22.0}
 %{?with_modemmanager:BuildRequires:	libqmi-devel >= 1.23.1}
 # for dell (which requires also uefi plugin and efivar)
@@ -64,7 +64,7 @@ BuildRequires:	libxmlb-devel >= 0.3.18
 BuildRequires:	linux-libc-headers >= 7:4.4
 BuildRequires:	meson >= 0.62.0
 BuildRequires:	ninja >= 1.6
-BuildRequires:	passim-devel >= 0.1.2
+BuildRequires:	passim-devel >= 0.1.5
 BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.114
 BuildRequires:	protobuf-c-devel
@@ -156,9 +156,9 @@ Requires:	json-glib >= 1.6.0
 Requires:	libcbor >= 0.7.0
 Requires:	libgudev >= 232
 Requires:	libgusb >= 0.3.8
-Requires:	libjcat >= 0.1.4
+Requires:	libjcat >= 0.2.0
 Requires:	libxmlb >= 0.3.18
-Requires:	passim-libs >= 0.1.2
+Requires:	passim-libs >= 0.1.5
 Requires:	polkit-libs >= 0.114
 
 %description libs
@@ -175,7 +175,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 Requires:	curl-devel >= 7.62.0
 Requires:	glib2-devel >= 1:2.68.0
 Requires:	json-glib-devel >= 1.6.0
-Requires:	libjcat-devel >= 0.1.4
+Requires:	libjcat-devel >= 0.2.0
 
 %description devel
 Header files for fwupd libraries.
