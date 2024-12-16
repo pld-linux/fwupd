@@ -1,7 +1,6 @@
 #
 # Conditional build:
 %bcond_without	apidocs
-%bcond_without	dell		# Dell-specific support
 %bcond_without	efi		# UEFI (and dell, redfish) support
 %bcond_without	flashrom	# flashrom plugin
 %bcond_without	modemmanager	# modem_manager plugin
@@ -9,13 +8,6 @@
 
 %ifnarch %{ix86} %{x8664} x32 %{arm} aarch64
 %undefine	with_efi
-%endif
-# libsmbios archs
-%ifnarch	%{ix86} %{x8664} x32
-%undefine	with_dell
-%endif
-%if %{without efi}
-%undefine	with_dell
 %endif
 %ifarch %{ix86} %{x8664} x32
 %define		with_intel_spi	1
@@ -56,8 +48,6 @@ BuildRequires:	libgusb-devel >= 0.3.8
 BuildRequires:	libjcat-devel >= 0.2.0
 %{?with_modemmanager:BuildRequires:	libmbim-devel >= 1.22.0}
 %{?with_modemmanager:BuildRequires:	libqmi-devel >= 1.23.1}
-# for dell (which requires also uefi plugin and efivar)
-%{?with_dell:BuildRequires:	libsmbios-devel >= 2.4.0}
 BuildRequires:	libuuid-devel
 BuildRequires:	libxmlb-devel >= 0.3.18
 # for <linux/nvme_ioctl.h>
@@ -95,7 +85,6 @@ BuildRequires:	python3-pygobject3
 Requires:	%{name}-libs = %{version}-%{release}
 %{?with_modemmanager:Requires:	libmbim >= 1.22.0}
 %{?with_modemmanager:Requires:	libqmi >= 1.23.1}
-%{?with_dell:Requires:	libsmbios >= 2.4.0}
 Requires:	polkit >= 0.114
 Requires:	tpm2-tss >= 2.0
 %if %{with efi}
@@ -229,7 +218,6 @@ API języka Vala do biblioteki fwupd.
 	-Defi_binary=false \
 	-Ddocs=%{__enabled_disabled apidocs} \
 	-Dlzma=enabled \
-	%{!?with_dell:-Dplugin_dell=disabled} \
 	%{!?with_flashrom:-Dplugin_flashrom=disabled} \
 	%{?with_intel_spi:-Dplugin_intel_spi=true} \
 	%{!?with_modemmanager:-Dplugin_modem_manager=disabled} \
