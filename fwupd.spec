@@ -212,7 +212,7 @@ API języka Vala do biblioteki fwupd.
 %setup -q
 
 %build
-%meson build \
+%meson \
 	-Dbluez=enabled \
 	-Dcompat_cli=true \
 	-Defi_binary=false \
@@ -226,12 +226,12 @@ API języka Vala do biblioteki fwupd.
 	%{!?with_efi:-Dplugin_uefi_pk=disabled} \
 	-Dtests=false
 
-%ninja_build -C build
+%meson_build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%ninja_install -C build
+%meson_install
 
 for pdoc in plugins/*/README.md ; do
 	pname=$(basename $(dirname $pdoc))
