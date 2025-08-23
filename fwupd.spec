@@ -15,6 +15,7 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
+# for 2.0.x see DEVEL-2 branch
 Version:	1.9.30
 Release:	1
 License:	LGPL v2.1+
@@ -23,7 +24,7 @@ Group:		Applications/System
 Source0:	https://github.com/fwupd/fwupd/releases/download/%{version}/%{name}-%{version}.tar.xz
 # Source0-md5:	7a5d4a5b12b3ed54b3effecb6e8020f7
 URL:		https://github.com/fwupd/fwupd
-%{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.10.0}
+%{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.18.0}
 BuildRequires:	bash-completion-devel >= 1:2.0
 %{?with_cairo:BuildRequires:	cairo-devel}
 BuildRequires:	curl-devel >= 7.62.0
@@ -46,8 +47,8 @@ BuildRequires:	libdrm-devel >= 2.4.113
 BuildRequires:	libgudev-devel >= 232
 BuildRequires:	libgusb-devel >= 0.3.8
 BuildRequires:	libjcat-devel >= 0.2.0
-%{?with_modemmanager:BuildRequires:	libmbim-devel >= 1.22.0}
-%{?with_modemmanager:BuildRequires:	libqmi-devel >= 1.23.1}
+%{?with_modemmanager:BuildRequires:	libmbim-devel >= 1.26.0}
+%{?with_modemmanager:BuildRequires:	libqmi-devel >= 1.30.0}
 BuildRequires:	libuuid-devel
 BuildRequires:	libxmlb-devel >= 0.3.18
 # for <linux/nvme_ioctl.h>
@@ -81,10 +82,10 @@ BuildRequires:	pango >= 1:1.26.0
 BuildRequires:	python3-pycairo
 BuildRequires:	python3-pygobject3
 %endif
-%{?with_modemmanager:BuildRequires:	ModemManager-libs >= 1.10.0}
+%{?with_modemmanager:BuildRequires:	ModemManager-libs >= 1.18.0}
 Requires:	%{name}-libs = %{version}-%{release}
-%{?with_modemmanager:Requires:	libmbim >= 1.22.0}
-%{?with_modemmanager:Requires:	libqmi >= 1.23.1}
+%{?with_modemmanager:Requires:	libmbim >= 1.26.0}
+%{?with_modemmanager:Requires:	libqmi >= 1.30.0}
 Requires:	polkit >= 0.114
 Requires:	tpm2-tss >= 2.0
 %if %{with efi}
