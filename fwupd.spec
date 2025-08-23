@@ -61,7 +61,7 @@ BuildRequires:	protobuf-c-devel
 BuildRequires:	python3 >= 1:3.0
 %{?with_apidocs:BuildRequires:	python3-markdown >= 3.2}
 BuildRequires:	rpm-build >= 4.6
-BuildRequires:	rpmbuild(macros) >= 2.029
+BuildRequires:	rpmbuild(macros) >= 2.042
 BuildRequires:	sqlite3-devel >= 3
 BuildRequires:	systemd-devel >= 1:211
 BuildRequires:	systemd-units >= 1:211
