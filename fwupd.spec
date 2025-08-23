@@ -15,13 +15,13 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	1.9.26
+Version:	1.9.30
 Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 #Source0Download: https://github.com/fwupd/fwupd/releases
 Source0:	https://github.com/fwupd/fwupd/releases/download/%{version}/%{name}-%{version}.tar.xz
-# Source0-md5:	a8431166caaad9a8c0449d3643ad494b
+# Source0-md5:	7a5d4a5b12b3ed54b3effecb6e8020f7
 URL:		https://github.com/fwupd/fwupd
 %{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.10.0}
 BuildRequires:	bash-completion-devel >= 1:2.0
@@ -214,16 +214,64 @@ API języka Vala do biblioteki fwupd.
 %build
 %meson \
 	-Dbluez=enabled \
+	-Dcbor=enabled \
 	-Dcompat_cli=true \
-	-Defi_binary=false \
+	-Dconsolekit=enabled \
+	-Dcurl=enabled \
 	-Ddocs=%{__enabled_disabled apidocs} \
+	-Defi_binary=false \
+	-Delogind=disabled \
+	-Dgnutls=enabled \
+	-Dgudev=enabled \
+	-Dgusb=enabled \
+	-Dhsi=enabled \
+	-Dintrospection=enabled \
+	-Dlaunchd=disabled \
+	-Dlibarchive=enabled \
 	-Dlzma=enabled \
-	%{!?with_flashrom:-Dplugin_flashrom=disabled} \
+	-Dpassim=enabled \
+	-Doffline=enabled \
+	-Dplugin_acpi_phat=enabled \
+	-Dplugin_amdgpu=enabled \
+	-Dplugin_android_boot=enabled \
+	-Dplugin_bcm57xx=enabled \
+	-Dplugin_cfu=enabled \
+	-Dplugin_cpu=enabled \
+	-Dplugin_emmc=enabled \
+	-Dplugin_ep963x=enabled \
+	-Dplugin_fastboot=enabled \
+	-Dplugin_flashrom=%{__enabled_disabled flashrom} \
+	-Dplugin_gpio=enabled \
+	-Dplugin_igsc=enabled \
+	-Dplugin_intel_me=enabled \
 	%{?with_intel_spi:-Dplugin_intel_spi=true} \
-	%{!?with_modemmanager:-Dplugin_modem_manager=disabled} \
-	%{!?with_efi:-Dplugin_redfish=disabled} \
-	%{!?with_efi:-Dplugin_uefi_capsule=disabled} \
-	%{!?with_efi:-Dplugin_uefi_pk=disabled} \
+	-Dplugin_kinetic_dp=enabled \
+	-Dplugin_logitech_bulkcontroller=enabled \
+	-Dplugin_logitech_scribe=enabled \
+	-Dplugin_logitech_tap=enabled \
+	-Dplugin_mediatek_scaler=enabled \
+	-Dplugin_modem_manager=%{__enabled_disabled modemmanager} \
+	-Dplugin_msr=enabled \
+	-Dplugin_mtd=enabled \
+	-Dplugin_nitrokey=enabled \
+	-Dplugin_nvme=enabled \
+	-Dplugin_parade_lspcon=enabled \
+	-Dplugin_pixart_rf=enabled \
+	-Dplugin_powerd=enabled \
+	-Dplugin_realtek_mst=enabled \
+	-Dplugin_redfish=%{__enabled_disabled efi} \
+	-Dplugin_scsi=enabled \
+	-Dplugin_synaptics_mst=enabled \
+	-Dplugin_synaptics_rmi=enabled \
+	-Dplugin_tpm=enabled \
+	-Dplugin_uefi_capsule=%{__enabled_disabled efi} \
+	-Dplugin_uefi_pk=%{__enabled_disabled efi} \
+	-Dplugin_uf2=enabled \
+	-Dplugin_upower=enabled \
+	-Dpolkit=enabled \
+	-Dsqlite=enabled \
+	-Dsupported_build=disabled \
+	-Dsystemd=enabled \
 	-Dtests=false
 
 %meson_build
