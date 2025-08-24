@@ -12,6 +12,9 @@
 %ifarch %{ix86} %{x8664} x32
 %define		with_intel_spi	1
 %endif
+%ifarch %{ix86} %{x8664} x32
+%define		with_msr	1
+%endif
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
@@ -252,7 +255,7 @@ API języka Vala do biblioteki fwupd.
 	-Dplugin_logitech_tap=enabled \
 	-Dplugin_mediatek_scaler=enabled \
 	-Dplugin_modem_manager=%{__enabled_disabled modemmanager} \
-	-Dplugin_msr=enabled \
+	-Dplugin_msr=%{__enabled_disabled msr} \
 	-Dplugin_mtd=enabled \
 	-Dplugin_nitrokey=enabled \
 	-Dplugin_nvme=enabled \
