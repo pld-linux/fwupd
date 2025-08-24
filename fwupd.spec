@@ -63,6 +63,7 @@ BuildRequires:	pkgconfig
 BuildRequires:	polkit-devel >= 0.114
 BuildRequires:	protobuf-c-devel
 BuildRequires:	python3 >= 1:3.0
+BuildRequires:	python3-jinja2
 %{?with_apidocs:BuildRequires:	python3-markdown >= 3.2}
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpmbuild(macros) >= 2.042
