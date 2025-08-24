@@ -5,6 +5,7 @@
 %bcond_without	flashrom	# flashrom plugin
 %bcond_without	modemmanager	# modem_manager plugin
 %bcond_without	thunderbolt	# Thunderbolt support
+%bcond_without	static_libs	# static libraries
 
 %ifnarch %{ix86} %{x8664} x32 %{arm} aarch64
 %undefine	with_efi
@@ -218,6 +219,7 @@ API języka Vala do biblioteki fwupd.
 
 %build
 %meson \
+	%{!?with_static_libs:--default-library=shared} \
 	-Dbluez=enabled \
 	-Dcbor=enabled \
 	-Dcompat_cli=true \
@@ -411,12 +413,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/dbus-1/interfaces/org.freedesktop.fwupd.xml
 %{_pkgconfigdir}/fwupd.pc
 
+%if %{with static_libs}
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/libfwupd.a
 %{fwupd_plugins_dir}/libfwupdengine.a
 %{fwupd_plugins_dir}/libfwupdplugin.a
 %{fwupd_plugins_dir}/libfwupdutil.a
+%endif
 
 %if %{with apidocs}
 %files apidocs
