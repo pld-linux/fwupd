@@ -346,7 +346,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pki/fwupd-metadata/GPG-KEY-Linux-Foundation-Metadata
 %{_sysconfdir}/pki/fwupd-metadata/GPG-KEY-Linux-Vendor-Firmware-Service
 %{_sysconfdir}/pki/fwupd-metadata/LVFS-CA.pem
-%{_prefix}/lib/modules-load.d/fwupd-msr.conf
+%{?with_msr:%{_prefix}/lib/modules-load.d/fwupd-msr.conf}
 %{systemdunitdir}/fwupd.service
 %{systemdunitdir}/fwupd-offline-update.service
 %{systemdunitdir}/fwupd-refresh.service
