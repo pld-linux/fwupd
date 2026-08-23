@@ -1,0 +1,58 @@
+--- a/docs/meson.build
++++ b/docs/meson.build
+@@ -284,13 +284,11 @@
+     install_tag: 'doc',
+     install_dir: join_paths(datadir, 'doc', 'fwupd'),
+   )
+-  if hsi
+-    install_data(
+-      ['hsi.html'],
+-      install_tag: 'doc',
+-      install_dir: join_paths(datadir, 'doc', 'fwupd'),
+-    )
+-  endif
++  install_data(
++    ['hsi.html'],
++    install_tag: 'doc',
++    install_dir: join_paths(datadir, 'doc', 'fwupd'),
++  )
+   install_data(
+     ['urlmap_fwupd.js'],
+     install_tag: 'doc',
+--- a/plugins/uefi-dbx/meson.build
++++ b/plugins/uefi-dbx/meson.build
+@@ -1,3 +1,18 @@
++# the generated docs are shipped architecture-independently, so build them
++# before the allow_uefi guard skips the rest of this file
++if build_docs
++  md_targets += custom_target('dbxtool.md',
++    input: 'dbxtool.md',
++    output: 'dbxtool.md',
++    command: [
++      generate_man, '@INPUT@', '-o', '@OUTPUT@',
++      '--replace', 'PACKAGE_VERSION', fwupd_version,
++      '--md',
++    ],
++  )
++  man_md += ['"dbxtool.md"']
++endif
++
+ allow_uefi or subdir_done()
+ 
+ cargs = ['-DG_LOG_DOMAIN="FuPluginUefiDbx"']
+@@ -84,15 +99,3 @@
+     install_dir: join_paths(mandir, 'man1'),
+   )
+ endif
+-if build_docs
+-  md_targets += custom_target('dbxtool.md',
+-    input: 'dbxtool.md',
+-    output: 'dbxtool.md',
+-    command: [
+-      generate_man, '@INPUT@', '-o', '@OUTPUT@',
+-      '--replace', 'PACKAGE_VERSION', fwupd_version,
+-      '--md',
+-    ],
+-  )
+-  man_md += ['"dbxtool.md"']
+-endif

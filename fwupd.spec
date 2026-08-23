@@ -16,12 +16,13 @@ Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
 Version:	2.1.7
-Release:	1
+Release:	2
 License:	LGPL v2.1+
 Group:		Applications/System
 #Source0Download: https://github.com/fwupd/fwupd/releases
 Source0:	https://github.com/fwupd/fwupd/releases/download/%{version}/%{name}-%{version}.tar.xz
 # Source0-md5:	c3472f4d47fedaae417a95fc4dc1f22b
+Patch0:		%{name}-arch-independent-docs.patch
 URL:		https://github.com/fwupd/fwupd
 %{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.22.0}
 BuildRequires:	bash-completion-devel >= 1:2.0
@@ -198,6 +199,7 @@ API języka Vala do biblioteki fwupd.
 
 %prep
 %setup -q
+%patch -P0 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env python3$,%{__python3},' contrib/firmware_packager/*.py
 
