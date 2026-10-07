@@ -1,3 +1,4 @@
+# TODO: fwupd-refresh user
 #
 # Conditional build:
 %bcond_without	apidocs
@@ -15,13 +16,13 @@
 Summary:	System daemon for installing device firmware
 Summary(pl.UTF-8):	Demon systemowy do instalowania firmware'u urządzeń
 Name:		fwupd
-Version:	2.1.7
-Release:	2
+Version:	2.1.8
+Release:	1
 License:	LGPL v2.1+
 Group:		Applications/System
 #Source0Download: https://github.com/fwupd/fwupd/releases
 Source0:	https://github.com/fwupd/fwupd/releases/download/%{version}/%{name}-%{version}.tar.xz
-# Source0-md5:	c3472f4d47fedaae417a95fc4dc1f22b
+# Source0-md5:	5d67e87d1dd7057d6e850af60c72bc17
 Patch0:		%{name}-arch-independent-docs.patch
 URL:		https://github.com/fwupd/fwupd
 %{?with_modemmanager:BuildRequires:	ModemManager-devel >= 1.22.0}
@@ -35,6 +36,7 @@ BuildRequires:	gcc-multilib-64 >= 6:8
 BuildRequires:	gettext-tools >= 0.19.7
 %{?with_apidocs:BuildRequires:	gi-docgen >= 2021.1}
 BuildRequires:	glib2-devel >= 1:2.68.0
+# or openssl with -Dgnutls=disabled -Dopenssl=enabled
 BuildRequires:	gnutls-devel >= 3.6.0
 BuildRequires:	gobject-introspection-devel >= 0.9.8
 BuildRequires:	libblkid-devel
@@ -50,7 +52,7 @@ BuildRequires:	meson >= 0.63.0
 BuildRequires:	ninja >= 1.6
 BuildRequires:	passim-devel >= 0.1.6
 BuildRequires:	pkgconfig
-BuildRequires:	polkit-devel >= 0.103
+BuildRequires:	polkit-devel >= 0.114
 BuildRequires:	python3 >= 1:3.0
 %{?with_tests:BuildRequires:	python3-dbusmock}
 BuildRequires:	python3-jinja2
@@ -80,7 +82,7 @@ BuildRequires:	python3-pygobject3
 Requires:	%{name}-libs = %{version}-%{release}
 %{?with_modemmanager:Requires:	libmbim >= 1.28.0}
 %{?with_modemmanager:Requires:	libqmi >= 1.32.0}
-Requires:	polkit >= 0.103
+Requires:	polkit >= 0.114
 %if %{with efi}
 Suggests:	fwupd-efi
 %endif
@@ -138,7 +140,7 @@ Requires:	gnutls-libs >= 3.6.0
 Requires:	hwdata
 Requires:	libxmlb >= 0.3.19
 Requires:	passim-libs >= 0.1.6
-Requires:	polkit-libs >= 0.103
+Requires:	polkit-libs >= 0.114
 Requires:	tpm2-tss >= 2.0
 
 %description libs
@@ -216,6 +218,7 @@ API języka Vala do biblioteki fwupd.
 	-Dlibdrm=enabled \
 	-Dlibmnl=enabled \
 	-Dlogind=enabled \
+	-Dopenssl=disabled \
 	-Dpassim=enabled \
 	-Dplugin_modem_manager=%{__enabled_disabled modemmanager} \
 	-Dpolkit=enabled \
@@ -230,7 +233,9 @@ API języka Vala do biblioteki fwupd.
 
 %meson_build
 
-%{?with_tests:%meson_test}
+%if %{with tests}
+%meson_test
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -269,7 +274,9 @@ rm -rf $RPM_BUILD_ROOT
 %files -f %{name}.lang
 %defattr(644,root,root,755)
 %doc MAINTAINERS README.md README-*.md SECURITY.md
-%{?with_efi:%attr(755,root,root) %{_bindir}/dbxtool}
+%if %{with efi}
+%attr(755,root,root) %{_bindir}/dbxtool
+%endif
 %attr(755,root,root) %{_bindir}/fwupdmgr
 %attr(755,root,root) %{_bindir}/fwupdtool
 %dir %{_libexecdir}/fwupd
@@ -278,7 +285,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libexecdir}/fwupd/fwupd-detect-cet
 %endif
 %if %{with modemmanager}
-%attr(755,root,root) %{fwupd_plugins_dir}/libfu_plugin_modem_manager.so
+%{fwupd_plugins_dir}/libfu_plugin_modem_manager.so
 %endif
 %dir %{_sysconfdir}/fwupd
 %dir %{_sysconfdir}/fwupd/bios-settings.d
@@ -298,7 +305,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pki/fwupd-metadata/LVFS-CA.pem
 %{_sysconfdir}/pki/fwupd-metadata/LVFS-CA-2025PQ.pem
 %{_prefix}/lib/modules-load.d/fwupd-i2c.conf
-%{?with_hsi:%{_prefix}/lib/modules-load.d/fwupd-msr.conf}
+%if %{with hsi}
+%{_prefix}/lib/modules-load.d/fwupd-msr.conf
+%endif
 %if %{with efi}
 %dir /lib/grub.d
 %attr(755,root,root) /lib/grub.d/35_fwupd
@@ -330,7 +339,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_iconsdir}/hicolor/64x64/apps/org.freedesktop.fwupd.png
 %{_iconsdir}/hicolor/128x128/apps/org.freedesktop.fwupd.png
 %{_iconsdir}/hicolor/scalable/apps/org.freedesktop.fwupd.svg
-%{?with_efi:%{_mandir}/man1/dbxtool.1*}
+%if %{with efi}
+%{_mandir}/man1/dbxtool.1*
+%endif
 %{_mandir}/man1/fwupdmgr.1*
 %{_mandir}/man1/fwupdtool.1*
 %{_mandir}/man5/fwupd-remotes.d.5*
@@ -348,13 +359,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libfwupd.so.*.*.*
+%{_libdir}/libfwupd.so.*.*.*
 %ghost %{_libdir}/libfwupd.so.3
 %{_libdir}/girepository-1.0/Fwupd-2.0.typelib
 %dir %{fwupd_plugins_dir}
-%attr(755,root,root) %{fwupd_plugins_dir}/libfwupdengine.so
-%attr(755,root,root) %{fwupd_plugins_dir}/libfwupdplugin.so
-%attr(755,root,root) %{fwupd_plugins_dir}/libfwupdutil.so
+%{fwupd_plugins_dir}/libfwupdengine.so
+%{fwupd_plugins_dir}/libfwupdplugin.so
+%{fwupd_plugins_dir}/libfwupdutil.so
 
 %files devel
 %defattr(644,root,root,755)
