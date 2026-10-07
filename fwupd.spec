@@ -79,6 +79,12 @@ BuildRequires:	python3-pycairo
 BuildRequires:	python3-pygobject3
 %endif
 %{?with_modemmanager:BuildRequires:	ModemManager-libs >= 1.22.0}
+Requires(postun):	/usr/sbin/groupdel
+Requires(postun):	/usr/sbin/userdel
+Requires(pre):	/bin/id
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/useradd
 Requires:	%{name}-libs = %{version}-%{release}
 %{?with_modemmanager:Requires:	libmbim >= 1.28.0}
 %{?with_modemmanager:Requires:	libqmi >= 1.32.0}
@@ -86,6 +92,8 @@ Requires:	polkit >= 0.114
 %if %{with efi}
 Suggests:	fwupd-efi
 %endif
+Provides:	group(fwupd-refresh)
+Provides:	user(fwupd-refresh)
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		fwupd_plugins_dir	%{_libdir}/fwupd-%{version}
@@ -239,6 +247,7 @@ API języka Vala do biblioteki fwupd.
 
 %install
 rm -rf $RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT/var/lib/fwupd
 
 %meson_install
 
@@ -267,6 +276,16 @@ install -d $RPM_BUILD_ROOT/lib
 
 %clean
 rm -rf $RPM_BUILD_ROOT
+
+%pre
+%groupadd -g 366 fwupd-refresh
+%useradd -u 366 -d /var/lib/fwupd -g fwupd-refresh -c "Firmware update daemon" fwupd-refresh
+
+%postun
+if [ "$1" = "0" ]; then
+	%userremove fwupd-refresh
+	%groupremove fwupd-refresh
+fi
 
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
@@ -312,6 +331,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /lib/grub.d
 %attr(755,root,root) /lib/grub.d/35_fwupd
 %endif
+%attr(700,root,root) %dir /var/lib/fwupd
 %{systemdunitdir}/fwupd.service
 %{systemdunitdir}/fwupd-refresh.service
 %{systemdunitdir}/fwupd-refresh.timer
